@@ -20,6 +20,10 @@ repo: [robotic_hand_pcb](https://github.com/danielljeon/robotic_hand_pcb).
     * [1.2 Block Diagram](#12-block-diagram)
     * [1.3 Pin Configurations](#13-pin-configurations)
     * [1.4 Clock Configurations](#14-clock-configurations)
+  * [2 VL53L4CD Time of Flight (TOF) Sensor](#2-vl53l4cd-time-of-flight-tof-sensor)
+    * [2.1 Background](#21-background)
+    * [2.2 Inter-Integrated Circuit (I2C)](#22-inter-integrated-circuit-i2c)
+    * [2.3 VL53L4CD Driver](#23-vl53l4cd-driver)
 <!-- TOC -->
 
 </details>
@@ -102,3 +106,26 @@ Phase-Locked Loop Main (PLLM)
 ```
 
 ---
+
+## 2 VL53L4CD Time of Flight (TOF) Sensor
+
+### 2.1 Background
+
+The VL53L4CD was chosen for it's close range high accuracy ranging performance.
+
+### 2.2 Inter-Integrated Circuit (I2C)
+
+As specified by datasheets, I2C Fast Mode is used for the (fast mode standard)
+400 kHz clock.
+
+A clock duty cycle of 2 (50/50) is used for simplicity.
+
+### 2.3 VL53L4CD Driver
+
+1. [vl53l4cd_hal_i2c.h](Core/Inc/vl53l4cd_hal_i2c.h)
+2. [vl53l4cd_hal_i2c.c](Core/Src/vl53l4cd_hal_i2c.c)
+3. [VL53L4CD_ULD_Driver](Core/VL53L4CD_ULD_Driver)
+    1. [VL53L4CD_api.c](Core/VL53L4CD_ULD_Driver/VL53L4CD_api.c)
+    2. [VL53L4CD_api.h](Core/VL53L4CD_ULD_Driver/VL53L4CD_api.h)
+    3. [VL53L4CD_calibration.c](Core/VL53L4CD_ULD_Driver/VL53L4CD_calibration.c)
+    4. [VL53L4CD_calibration.h](Core/VL53L4CD_ULD_Driver/VL53L4CD_calibration.h)
