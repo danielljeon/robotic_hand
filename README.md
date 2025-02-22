@@ -5,6 +5,9 @@
 Robotic hand project for actuators/power electronics and sensors/instrumentation
 university courses (firmware).
 
+robotic_hand_pcb hardware
+repo: [robotic_hand_pcb](https://github.com/danielljeon/robotic_hand_pcb).
+
 ---
 
 <details markdown="1">
