@@ -48,7 +48,11 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(${includes})
+# Include directories.
+include_directories(
+        ${includes}
+        "Core/VL53L4CD_ULD_Driver"
+)
 
 add_definitions(${defines})
 
