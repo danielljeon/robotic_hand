@@ -2,6 +2,26 @@
  * @file vl53l4cd_hal_i2c.h
  * @brief VL53L4CD functions: abstracting STM32 HAL: I2C.
  *******************************************************************************
+ * @note:
+ * Based on STMicroelectronics's original example code found here:
+ * https://www.st.com/en/embedded-software/stsw-img049.html. The original
+ * license header is found below.
+ *******************************************************************************
+ */
+
+/*******************************************************************************
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software component is licensed by ST under SLA0103 open source license.
+ * You may obtain a copy of the License at:
+ * https://www.st.com/content/ccc/resource/legal/legal_agreement/
+ * license_agreement/group0/6f/17/42/59/94/31/49/6f/DM01026308/files/
+ * DM01026308.pdf/jcr:content/translations/en.DM01026308.pdf
+ *
+ *
+ *******************************************************************************
  */
 
 #ifndef VL53L4CD_HAL_I2C_H
