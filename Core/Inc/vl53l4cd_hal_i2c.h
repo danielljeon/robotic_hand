@@ -38,12 +38,19 @@
 // Max I2C buffer size.
 #define VL53L4CD_MAX_I2C_XFER_SIZE 8
 
+// I2C addressing.
+#define VL53L4CD_DEFAULT_I2C_ADDRESS 0x68
+
 /** STM32 port and pin configs. ***********************************************/
 
 extern I2C_HandleTypeDef hi2c1;
 
 // I2C.
 #define VL53L4CD_HI2C hi2c1
+
+// GPIO output XSHUT.
+#define VL53L4CD_XSHUT_PORT GPIOB
+#define VL53L4CD_XSHUT_PIN GPIO_PIN_4
 
 /**
  * @brief If the macro below is defined, the device will be programmed to run
