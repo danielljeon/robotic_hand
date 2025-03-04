@@ -34,12 +34,9 @@
 #include "stm32f4xx_hal.h"
 #include "vl53l4cd_hal_i2c.h"
 
-/** Private variables. ********************************************************/
-
-Dev_t dev;
-
 /** Public variables. *********************************************************/
 
+extern Dev_t dev;
 extern uint16_t vl53l4cd_distance_mm;
 
 /** Public functions. *********************************************************/
