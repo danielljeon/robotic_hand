@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "vl53l4cd_runner.h"
+#include "ws2812b_hal_pwm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,6 +114,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  // WS2812B setup.
+  ws2812b_init();
+  ws2812b_set_colour(0, 4, 1, 1); // Very dim purple.
+  ws2812b_update();
+
   // vl53l4cd_init();
   while (1) {
     // vl53l4cd_get_data();
