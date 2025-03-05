@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "vl53l4cd_runner.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,8 +113,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  // vl53l4cd_init();
+  while (1) {
+    // vl53l4cd_get_data();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -461,7 +462,10 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_10
                           |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15
-                          |GPIO_XSHUT_VL53L4CD_Pin|SPI1_CS_BNO085_Pin, GPIO_PIN_RESET);
+                          |SPI1_CS_BNO085_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIO_XSHUT_VL53L4CD_GPIO_Port, GPIO_XSHUT_VL53L4CD_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : PC0 PC1 PC2 PC3
                            GPIO_RST_BNO085_Pin GPIO_P0_BNO085_Pin PC6 PC7
@@ -506,11 +510,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(EXTI2_DRDY_ADC_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : EXTI5_INT_VL53L4CD_Pin */
-  GPIO_InitStruct.Pin = EXTI5_INT_VL53L4CD_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  /*Configure GPIO pin : GPIO_Input_GPIO_VL53L4CD_Pin */
+  GPIO_InitStruct.Pin = GPIO_Input_GPIO_VL53L4CD_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(EXTI5_INT_VL53L4CD_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIO_Input_GPIO_VL53L4CD_GPIO_Port, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
