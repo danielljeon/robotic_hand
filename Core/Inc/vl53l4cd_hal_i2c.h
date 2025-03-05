@@ -39,7 +39,7 @@
 #define VL53L4CD_MAX_I2C_XFER_SIZE 8
 
 // I2C addressing.
-#define VL53L4CD_DEFAULT_I2C_ADDRESS 0x68
+#define VL53L4CD_DEFAULT_I2C_ADDRESS 0x52
 
 /** STM32 port and pin configs. ***********************************************/
 
