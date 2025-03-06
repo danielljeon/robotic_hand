@@ -18,6 +18,7 @@
 #define ADS114S08_CMD_RDATA 0x12
 #define ADS114S08_CMD_RREG 0x20
 #define ADS114S08_CMD_WREG 0x40
+#define ADS114S08_CMD_STATUS 0x01
 
 /** STM32 port and pin configs. ***********************************************/
 
@@ -51,7 +52,9 @@ uint8_t ads114s08_read_register(const uint8_t address) {
   cmd[0] = ADS114S08_CMD_RREG | (address & 0x1F);
   cmd[1] = 0x00; // Read one register.
 
+  // SPI chip select.
   ads114s08_select();
+  // Delay for td(CSSC) = 20 ns.
 
   // Transmit the read register command.
   HAL_SPI_Transmit(&hspi1, cmd, 2, HAL_MAX_DELAY);
@@ -59,6 +62,7 @@ uint8_t ads114s08_read_register(const uint8_t address) {
   // Receive the register value.
   HAL_SPI_Receive(&hspi1, &value, 1, HAL_MAX_DELAY);
 
+  // SPI chip deselect.
   ads114s08_deselect();
 
   return value;
@@ -78,13 +82,18 @@ uint32_t ads114s08_read_data(void) {
   uint8_t rxBuffer[3] = {0};
   uint32_t data = 0;
 
+  // SPI chip select.
   ads114s08_select();
+  // Delay for td(CSSC) = 20 ns.
+
   // Send the RDATA command to trigger a read
   uint8_t rdataCmd = ADS114S08_CMD_RDATA;
   HAL_SPI_Transmit(&hspi1, &rdataCmd, 1, HAL_MAX_DELAY);
 
   // Read 3 bytes of data (the ADC outputs a 24-bit word)
   HAL_SPI_Receive(&hspi1, rxBuffer, 3, HAL_MAX_DELAY);
+
+  // SPI chip deselect.
   ads114s08_deselect();
 
   // Combine the three bytes into a 24-bit value.
@@ -96,10 +105,24 @@ uint32_t ads114s08_read_data(void) {
 }
 
 void ads114s08_init(void) {
+
+  HAL_Delay(3); // Begin communication 2.2 ms after reaching operating voltages.
+
   ads114s08_write_command(ADS114S08_CMD_RESET); // Reset.
 
   HAL_Delay(1); // Delay time = 4096 * tCLK, tCLK = 1 / fCLK.
 
-  // Start conversions
-  ads114s08_write_command(ADS114S08_CMD_START); //
+  // Read RDY bit from STATUS register (optional).
+  uint8_t nrdy_bit = ads114s08_read_register(ADS114S08_CMD_STATUS) & 0x40;
+
+  if (nrdy_bit == 0) { // If NRDY.
+    // Clear the FL_POR flag by writing 0x00 to the status register (optional).
+
+    // TODO: Write configuration bits via WREG and readback for verification.
+
+    // Start conversions.
+    ads114s08_write_command(ADS114S08_CMD_START);
+  } else { // Else error.
+    // Error state.
+  }
 }
