@@ -24,6 +24,12 @@ repo: [robotic_hand_pcb](https://github.com/danielljeon/robotic_hand_pcb).
     * [2.1 Background](#21-background)
     * [2.2 Inter-Integrated Circuit (I2C)](#22-inter-integrated-circuit-i2c)
     * [2.3 VL53L4CD Driver](#23-vl53l4cd-driver)
+  * [2 ADS114S08 Analog to Digital Convertor (ADC) IC](#2-ads114s08-analog-to-digital-convertor-adc-ic)
+    * [2.1 Background](#21-background-1)
+    * [2.2 Serial Peripheral Interface (SPI)](#22-serial-peripheral-interface-spi)
+    * [2.3 Nested Vectored Interrupt Controller (NVIC)](#23-nested-vectored-interrupt-controller-nvic)
+      * [2.3.1 GPIO External Interrupt/Event Controller (EXTI)](#231-gpio-external-interruptevent-controller-exti)
+    * [2.4 ADS114S08 Driver](#24-ads114s08-driver)
 <!-- TOC -->
 
 </details>
@@ -129,3 +135,34 @@ A clock duty cycle of 2 (50/50) is used for simplicity.
     2. [VL53L4CD_api.h](Core/VL53L4CD_ULD_Driver/VL53L4CD_api.h)
     3. [VL53L4CD_calibration.c](Core/VL53L4CD_ULD_Driver/VL53L4CD_calibration.c)
     4. [VL53L4CD_calibration.h](Core/VL53L4CD_ULD_Driver/VL53L4CD_calibration.h)
+
+---
+
+## 2 ADS114S08 Analog to Digital Convertor (ADC) IC
+
+### 2.1 Background
+
+The ADS114S08 was chosen for it's high configurability and 16-bit precision
+analog readings within a small package.
+
+### 2.2 Serial Peripheral Interface (SPI)
+
+The datasheet specifies the use of SPI mode 1:
+
+- CPOL = 0 (low).
+- CPHA = 1 (2nd edge).
+
+### 2.3 Nested Vectored Interrupt Controller (NVIC)
+
+#### 2.3.1 GPIO External Interrupt/Event Controller (EXTI)
+
+`GPIO_EXTI2`is configured for the `DRDY` pin of the ADS114S08 to trigger an MCU
+response:
+
+- External Interrupt Mode with Falling edge trigger detection.
+- No Pull-up.
+
+### 2.4 ADS114S08 Driver
+
+1. [ads114s08_hal_spi.c](Core/Src/ads114s08_hal_spi.c).
+2. [ads114s08_hal_spi.h](Core/Inc/ads114s08_hal_spi.h).
