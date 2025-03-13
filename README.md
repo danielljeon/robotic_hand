@@ -131,10 +131,10 @@ A clock duty cycle of 2 (50/50) is used for simplicity.
 1. [vl53l4cd_hal_i2c.h](Core/Inc/vl53l4cd_hal_i2c.h)
 2. [vl53l4cd_hal_i2c.c](Core/Src/vl53l4cd_hal_i2c.c)
 3. [VL53L4CD_ULD_Driver](Core/VL53L4CD_ULD_Driver)
-    1. [VL53L4CD_api.c](Core/VL53L4CD_ULD_Driver/VL53L4CD_api.c)
-    2. [VL53L4CD_api.h](Core/VL53L4CD_ULD_Driver/VL53L4CD_api.h)
-    3. [VL53L4CD_calibration.c](Core/VL53L4CD_ULD_Driver/VL53L4CD_calibration.c)
-    4. [VL53L4CD_calibration.h](Core/VL53L4CD_ULD_Driver/VL53L4CD_calibration.h)
+    1. [VL53L4CD_api.h](Core/VL53L4CD_ULD_Driver/VL53L4CD_api.h)
+    2. [VL53L4CD_api.c](Core/VL53L4CD_ULD_Driver/VL53L4CD_api.c)
+    3. [VL53L4CD_calibration.h](Core/VL53L4CD_ULD_Driver/VL53L4CD_calibration.h)
+    4. [VL53L4CD_calibration.c](Core/VL53L4CD_ULD_Driver/VL53L4CD_calibration.c)
 
 ---
 
@@ -164,5 +164,5 @@ response:
 
 ### 2.4 ADS114S08 Driver
 
-1. [ads114s08_hal_spi.c](Core/Src/ads114s08_hal_spi.c).
-2. [ads114s08_hal_spi.h](Core/Inc/ads114s08_hal_spi.h).
+1. [ads114s08_hal_spi.h](Core/Inc/ads114s08_hal_spi.h).
+2. [ads114s08_hal_spi.c](Core/Src/ads114s08_hal_spi.c).
