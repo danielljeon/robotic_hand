@@ -26,7 +26,7 @@
 extern SPI_HandleTypeDef hspi1;
 
 // SPI.
-#define ADS114S08_HI2C hspi1
+#define ADS114S08_HI2C hspi3
 
 #define ADS114S08_CS_PORT GPIOA
 #define ADS114S08_CS_PIN GPIO_PIN_4
@@ -117,8 +117,9 @@ void ads114s08_init(void) {
 
   if (nrdy_bit == 0) { // If NRDY.
     // Clear the FL_POR flag by writing 0x00 to the status register (optional).
+    ads114s08_write_command(ADS114S08_CMD_STATUS); // Reset.
 
-    // TODO: Write configuration bits via WREG and readback for verification.
+    // TODO: Write configuration bits via WREG and read back for verification.
 
     // Start conversions.
     ads114s08_write_command(ADS114S08_CMD_START);
