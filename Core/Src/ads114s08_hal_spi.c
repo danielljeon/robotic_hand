@@ -1,16 +1,16 @@
 /**
  *******************************************************************************
- * @file:  ads114s08_hal_spi.h
+ * @file:  ads114s08_hal_spi.c
  * @brief: ADS114S08 functions: abstracting STM32 HAL: SPI.
  *******************************************************************************
  */
 
-/** Includes. *****************************************************************/
+/** Includes ******************************************************************/
 
 #include "ads114s08_hal_spi.h"
 #include "stm32f4xx_hal.h"
 
-/** ADS114S08 constants. ******************************************************/
+/** ADS114S08 Command Definitions *********************************************/
 
 #define ADS114S08_CMD_RESET 0x06
 #define ADS114S08_CMD_START 0x08
@@ -20,110 +20,111 @@
 #define ADS114S08_CMD_WREG 0x40
 #define ADS114S08_CMD_STATUS 0x01
 
-/** STM32 port and pin configs. ***********************************************/
+/** STM32 Port and Pin Configurations *****************************************/
 
-// External SPI handle (ensure it’s properly instantiated in your project)
 extern SPI_HandleTypeDef hspi1;
-
-// SPI.
-#define ADS114S08_HI2C hspi3
 
 #define ADS114S08_CS_PORT GPIOA
 #define ADS114S08_CS_PIN GPIO_PIN_4
 
-/** Private functions. ********************************************************/
+/** Private Functions *********************************************************/
 
+/**
+ * @brief Select the ADS114S08 chip (active low).
+ */
 static void ads114s08_select(void) {
   HAL_GPIO_WritePin(ADS114S08_CS_PORT, ADS114S08_CS_PIN, GPIO_PIN_RESET);
 }
 
+/**
+ * @brief Deselect the ADS114S08 chip.
+ */
 static void ads114s08_deselect(void) {
   HAL_GPIO_WritePin(ADS114S08_CS_PORT, ADS114S08_CS_PIN, GPIO_PIN_SET);
 }
 
+/** Public Functions **********************************************************/
+
 uint8_t ads114s08_read_register(const uint8_t address) {
-  uint8_t cmd[2]; // Read register is 2 byte command.
+  uint8_t cmd[2] = {0};
   uint8_t value = 0;
 
-  // Format the read register command.
-  // The command is typically: 001r rrrr -> 0x20 | (regAddress & 0x1F). The
-  // second byte indicates the number of registers to read minus 1 (0 for one
-  // register).
+  /*
+   * Construct the read register command:
+   * First byte: 0x20 | (address & 0x1F).
+   * Second byte: number of registers to read minus one (0 for one register).
+   */
   cmd[0] = ADS114S08_CMD_RREG | (address & 0x1F);
-  cmd[1] = 0x00; // Read one register.
+  cmd[1] = 0x00;
 
-  // SPI chip select.
   ads114s08_select();
-  // Delay for td(CSSC) = 20 ns.
-
-  // Transmit the read register command.
   HAL_SPI_Transmit(&hspi1, cmd, 2, HAL_MAX_DELAY);
-
-  // Receive the register value.
   HAL_SPI_Receive(&hspi1, &value, 1, HAL_MAX_DELAY);
-
-  // SPI chip deselect.
   ads114s08_deselect();
 
   return value;
 }
 
-/** Public functions. *********************************************************/
-
 void ads114s08_write_command(uint8_t cmd) {
   ads114s08_select();
-
   HAL_SPI_Transmit(&hspi1, &cmd, 1, HAL_MAX_DELAY);
-
   ads114s08_deselect();
 }
 
-uint32_t ads114s08_read_data(void) {
-  uint8_t rxBuffer[3] = {0};
-  uint32_t data = 0;
+void ads114s08_write_register(const uint8_t address, const uint8_t value) {
+  uint8_t cmdBuffer[3] = {0};
 
-  // SPI chip select.
+  /*
+   * Construct the write register command:
+   * First byte: 0x40 | (address & 0x1F).
+   * Second byte: number of registers to write minus one (0 for one register).
+   * Third byte: the value to write.
+   */
+  cmdBuffer[0] = ADS114S08_CMD_WREG | (address & 0x1F);
+  cmdBuffer[1] = 0x00;
+  cmdBuffer[2] = value;
+
   ads114s08_select();
-  // Delay for td(CSSC) = 20 ns.
-
-  // Send the RDATA command to trigger a read
-  uint8_t rdataCmd = ADS114S08_CMD_RDATA;
-  HAL_SPI_Transmit(&hspi1, &rdataCmd, 1, HAL_MAX_DELAY);
-
-  // Read 3 bytes of data (the ADC outputs a 24-bit word)
-  HAL_SPI_Receive(&hspi1, rxBuffer, 3, HAL_MAX_DELAY);
-
-  // SPI chip deselect.
+  HAL_SPI_Transmit(&hspi1, cmdBuffer, 3, HAL_MAX_DELAY);
   ads114s08_deselect();
-
-  // Combine the three bytes into a 24-bit value.
-  // Adjust shifting if your data format is different.
-  data = ((uint32_t)rxBuffer[0] << 16) | ((uint32_t)rxBuffer[1] << 8) |
-         rxBuffer[2];
-
-  return data;
 }
 
 void ads114s08_init(void) {
+  HAL_Delay(3); // Wait at least 2.2 ms for power stabilization.
 
-  HAL_Delay(3); // Begin communication 2.2 ms after reaching operating voltages.
+  // Reset the device.
+  ads114s08_write_command(ADS114S08_CMD_RESET);
+  HAL_Delay(1); // Wait for reset to complete.
 
-  ads114s08_write_command(ADS114S08_CMD_RESET); // Reset.
-
-  HAL_Delay(1); // Delay time = 4096 * tCLK, tCLK = 1 / fCLK.
-
-  // Read RDY bit from STATUS register (optional).
+  // Read the status register to check the RDY bit.
   uint8_t nrdy_bit = ads114s08_read_register(ADS114S08_CMD_STATUS) & 0x40;
 
-  if (nrdy_bit == 0) { // If NRDY.
-    // Clear the FL_POR flag by writing 0x00 to the status register (optional).
-    ads114s08_write_command(ADS114S08_CMD_STATUS); // Reset.
+  if (nrdy_bit == 0) {
+    // Clear the FL_POR flag by writing to the status register if needed.
+    ads114s08_write_command(ADS114S08_CMD_STATUS);
 
-    // TODO: Write configuration bits via WREG and read back for verification.
+    // TODO: Configure additional registers via ads114s08_write_register()
+    //       and verify settings as needed.
 
-    // Start conversions.
+    // Start ADC conversions.
     ads114s08_write_command(ADS114S08_CMD_START);
-  } else { // Else error.
-    // Error state.
+  } else {
+    // Handle error: device not ready.
   }
+}
+
+uint32_t ads114s08_all_read_data(void) {
+  uint8_t rxBuffer[3] = {0};
+  uint32_t data = 0;
+  uint8_t txBuffer = ADS114S08_CMD_RDATA;
+
+  ads114s08_select();
+  // Use blocking mode to transmit the RDATA command and receive response.
+  HAL_SPI_TransmitReceive(&hspi1, &txBuffer, rxBuffer, 3, HAL_MAX_DELAY);
+  ads114s08_deselect();
+
+  // Combine the two ADC data bytes into a 16-bit value.
+  data = ((uint32_t)rxBuffer[1] << 8) | rxBuffer[2];
+
+  return data;
 }
