@@ -10,7 +10,21 @@
 
 /** Includes. *****************************************************************/
 
+#include "stm32f4xx_hal.h"
 #include <stdint.h>
+
+/** STM32 Port and Pin Configurations. ****************************************/
+
+extern SPI_HandleTypeDef hspi3;
+#define ADS114S08_HSPI hspi3
+#define ADS114S08_CS_PORT GPIOA
+#define ADS114S08_CS_PIN GPIO_PIN_4
+
+#define ADS114S08_NRESET_PORT GPIOA
+#define ADS114S08_NRESET_PIN GPIO_PIN_12
+
+#define ADS114S08_START_SYNC_PORT GPIOA
+#define ADS114S08_START_SYNC_PIN GPIO_PIN_11
 
 /** Public functions. *********************************************************/
 

@@ -129,7 +129,7 @@ int main(void)
   uint16_t data[12] = {0};
   // vl53l4cd_init();
   while (1) {
-    ads114s08_all_read_data(0x07, data);
+    ads114s08_all_read_data(0x06, data);
     // vl53l4cd_get_data();
     /* USER CODE END WHILE */
 
@@ -488,12 +488,15 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3
-                          |GPIO_SYNC_ADC_Pin|GPIO_RSTN_ADC_Pin|SPI3_CS_ADC_Pin, GPIO_PIN_RESET);
+                          |SPI3_CS_ADC_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_10
                           |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15
                           |SPI1_CS_BNO085_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_SYNC_ADC_Pin|GPIO_RSTN_ADC_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIO_XSHUT_VL53L4CD_GPIO_Port, GPIO_XSHUT_VL53L4CD_Pin, GPIO_PIN_SET);
