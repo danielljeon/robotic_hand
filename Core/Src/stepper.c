@@ -8,6 +8,7 @@
 /** Includes. *****************************************************************/
 
 #include "stepper.h"
+#include <stdbool.h>
 
 /** Private variables. ********************************************************/
 
@@ -39,6 +40,38 @@ static const uint8_t half_step_sequence[8] = {
     0x08, // 1000.
     0x09  // 1001.
 };
+
+/** Public stepper definitions. ***********************************************/
+
+stepper_motor_t stepper1 = {.coil_ports = {STEPPER_1_1_PORT, STEPPER_1_1_PORT,
+                                           STEPPER_1_1_PORT, STEPPER_1_1_PORT},
+                            .coil_pins = {STEPPER_1_1_PIN, STEPPER_1_2_PIN,
+                                          STEPPER_1_3_PIN, STEPPER_1_4_PIN},
+                            .current_step = 0};
+
+stepper_motor_t stepper2 = {.coil_ports = {STEPPER_2_1_PORT, STEPPER_2_1_PORT,
+                                           STEPPER_2_1_PORT, STEPPER_2_1_PORT},
+                            .coil_pins = {STEPPER_2_1_PIN, STEPPER_2_2_PIN,
+                                          STEPPER_2_3_PIN, STEPPER_2_4_PIN},
+                            .current_step = 0};
+
+stepper_motor_t stepper3 = {.coil_ports = {STEPPER_3_1_PORT, STEPPER_3_2_PORT,
+                                           STEPPER_3_3_PORT, STEPPER_3_4_PORT},
+                            .coil_pins = {STEPPER_3_1_PIN, STEPPER_3_2_PIN,
+                                          STEPPER_3_3_PIN, STEPPER_3_4_PIN},
+                            .current_step = 0};
+
+stepper_motor_t stepper4 = {.coil_ports = {STEPPER_4_1_PORT, STEPPER_4_1_PORT,
+                                           STEPPER_4_1_PORT, STEPPER_4_1_PORT},
+                            .coil_pins = {STEPPER_4_1_PIN, STEPPER_4_2_PIN,
+                                          STEPPER_4_3_PIN, STEPPER_4_4_PIN},
+                            .current_step = 0};
+
+stepper_motor_t stepper5 = {.coil_ports = {STEPPER_5_1_PORT, STEPPER_5_1_PORT,
+                                           STEPPER_5_1_PORT, STEPPER_5_1_PORT},
+                            .coil_pins = {STEPPER_5_1_PIN, STEPPER_5_2_PIN,
+                                          STEPPER_5_3_PIN, STEPPER_5_4_PIN},
+                            .current_step = 0};
 
 /** Private functions. ********************************************************/
 
@@ -116,4 +149,35 @@ void stepper_half_step(stepper_motor_t *motor, int steps, uint32_t delay_ms) {
 
 void stepper_full_step(stepper_motor_t *motor, int steps, uint32_t delay_ms) {
   stepper_do_steps(motor, steps, delay_ms, full_step_sequence, 4);
+}
+
+void stepper_multi_full_step(stepper_motor_t **motors, int *steps,
+                             const size_t motor_count,
+                             const uint32_t delay_ms) {
+  bool is_still_stepping = true;
+
+  while (is_still_stepping) {
+    // Assume all motors are done unless one still needs to step.
+    is_still_stepping = false;
+
+    for (size_t i = 0; i < motor_count; i++) {
+      if (steps[i] != 0) {
+        is_still_stepping = true;
+        if (steps[i] > 0) {
+          // Step forward: increment step index modulo 4 (full-step sequence).
+          motors[i]->current_step = (motors[i]->current_step + 1) % 4;
+          stepper_set_coils(motors[i], full_step_sequence, 4,
+                            motors[i]->current_step);
+          steps[i]--; // One forward step completed.
+        } else {      // steps[i] < 0.
+          // Step backward: subtract one step using modulo arithmetic.
+          motors[i]->current_step = (motors[i]->current_step + 3) % 4;
+          stepper_set_coils(motors[i], full_step_sequence, 4,
+                            motors[i]->current_step);
+          steps[i]++; // One reverse step completed (moving toward zero).
+        }
+      }
+    }
+    HAL_Delay(delay_ms);
+  }
 }

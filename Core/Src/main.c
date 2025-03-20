@@ -35,51 +35,6 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define STEPPER_1_1_PORT GPIOC
-#define STEPPER_1_1_PIN GPIO_PIN_0
-#define STEPPER_1_2_PORT GPIOC
-#define STEPPER_1_2_PIN GPIO_PIN_3
-#define STEPPER_1_3_PORT GPIOC
-#define STEPPER_1_3_PIN GPIO_PIN_2
-#define STEPPER_1_4_PORT GPIOC
-#define STEPPER_1_4_PIN GPIO_PIN_1
-
-#define STEPPER_2_1_PORT GPIOA
-#define STEPPER_2_1_PIN GPIO_PIN_0
-#define STEPPER_2_2_PORT GPIOA
-#define STEPPER_2_2_PIN GPIO_PIN_3
-#define STEPPER_2_3_PORT GPIOA
-#define STEPPER_2_3_PIN GPIO_PIN_2
-#define STEPPER_2_4_PORT GPIOA
-#define STEPPER_2_4_PIN GPIO_PIN_1
-
-#define STEPPER_3_1_PORT GPIOB
-#define STEPPER_3_1_PIN GPIO_PIN_0
-#define STEPPER_3_2_PORT GPIOB
-#define STEPPER_3_2_PIN GPIO_PIN_10
-#define STEPPER_3_3_PORT GPIOB
-#define STEPPER_3_3_PIN GPIO_PIN_2
-#define STEPPER_3_4_PORT GPIOB
-#define STEPPER_3_4_PIN GPIO_PIN_1
-
-#define STEPPER_4_1_PORT GPIOB
-#define STEPPER_4_1_PIN GPIO_PIN_15
-#define STEPPER_4_2_PORT GPIOB
-#define STEPPER_4_2_PIN GPIO_PIN_12
-#define STEPPER_4_3_PORT GPIOB
-#define STEPPER_4_3_PIN GPIO_PIN_13
-#define STEPPER_4_4_PORT GPIOB
-#define STEPPER_4_4_PIN GPIO_PIN_14
-
-#define STEPPER_5_1_PORT GPIOC
-#define STEPPER_5_1_PIN GPIO_PIN_6
-#define STEPPER_5_2_PORT GPIOC
-#define STEPPER_5_2_PIN GPIO_PIN_9
-#define STEPPER_5_3_PORT GPIOC
-#define STEPPER_5_3_PIN GPIO_PIN_8
-#define STEPPER_5_4_PORT GPIOC
-#define STEPPER_5_4_PIN GPIO_PIN_7
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -167,55 +122,26 @@ int main(void)
   // WS2812B setup.
   ws2812b_init();
 
-  stepper_motor_t stepper1 = {.coil_ports = {STEPPER_1_1_PORT, STEPPER_1_1_PORT,
-                                             STEPPER_1_1_PORT,
-                                             STEPPER_1_1_PORT},
-                              .coil_pins = {STEPPER_1_1_PIN, STEPPER_1_2_PIN,
-                                            STEPPER_1_3_PIN, STEPPER_1_4_PIN},
-                              .current_step = 0};
-
-  stepper_motor_t stepper2 = {.coil_ports = {STEPPER_2_1_PORT, STEPPER_2_1_PORT,
-                                             STEPPER_2_1_PORT,
-                                             STEPPER_2_1_PORT},
-                              .coil_pins = {STEPPER_2_1_PIN, STEPPER_2_2_PIN,
-                                            STEPPER_2_3_PIN, STEPPER_2_4_PIN},
-                              .current_step = 0};
-
-  stepper_motor_t stepper3 = {.coil_ports = {STEPPER_3_1_PORT, STEPPER_3_2_PORT,
-                                             STEPPER_3_3_PORT,
-                                             STEPPER_3_4_PORT},
-                              .coil_pins = {STEPPER_3_1_PIN, STEPPER_3_2_PIN,
-                                            STEPPER_3_3_PIN, STEPPER_3_4_PIN},
-                              .current_step = 0};
-
-  stepper_motor_t stepper4 = {.coil_ports = {STEPPER_4_1_PORT, STEPPER_4_1_PORT,
-                                             STEPPER_4_1_PORT,
-                                             STEPPER_4_1_PORT},
-                              .coil_pins = {STEPPER_4_1_PIN, STEPPER_4_2_PIN,
-                                            STEPPER_4_3_PIN, STEPPER_4_4_PIN},
-                              .current_step = 0};
-
-  stepper_motor_t stepper5 = {.coil_ports = {STEPPER_5_1_PORT, STEPPER_5_1_PORT,
-                                             STEPPER_5_1_PORT,
-                                             STEPPER_5_1_PORT},
-                              .coil_pins = {STEPPER_5_1_PIN, STEPPER_5_2_PIN,
-                                            STEPPER_5_3_PIN, STEPPER_5_4_PIN},
-                              .current_step = 0};
-
-  // ws2812b_set_colour(0, 6, 0, 0); // Very dim purple.
-  // ws2812b_update();
-  //
-  // // Initialize the stepper motor.
+  // // Initialize the stepper motors.
   // stepper_init(&stepper1);
-  //
-  // // For example, rotate the motor forward 32 half-steps with a 5ms delay
-  // // between steps.
-  // stepper_full_step(&stepper1, 2048, 1);
-  //
-  // ws2812b_set_colour(0, 0, 0, 6); // Very dim purple.
+  // stepper_init(&stepper2);
+  // stepper_init(&stepper3);
+  // stepper_init(&stepper4);
+  // stepper_init(&stepper5);
+  // stepper_motor_t *steppers[5] = {&stepper1, &stepper2, &stepper3, &stepper4,
+  //                                 &stepper5};
+  // // Red LED.
+  // ws2812b_set_colour(0, 6, 0, 0);
   // ws2812b_update();
-  //
-  // stepper_full_step(&stepper1, -2048, 1);
+  // // Step forward.
+  // int steps_1[5] = {2048, 2048, 2048, 2048, 2048};
+  // stepper_multi_full_step(steppers, steps_1, 5, 1);
+  // // Blue LED.
+  // ws2812b_set_colour(0, 0, 0, 6);
+  // ws2812b_update();
+  // // Step forward.
+  // int steps_2[5] = {-2048, -2048, -2048, -2048, -2048};
+  // stepper_multi_full_step(steppers, steps_2, 5, 1);
 
   ws2812b_set_colour(0, 4, 1, 1); // Very dim purple.
   ws2812b_update();
