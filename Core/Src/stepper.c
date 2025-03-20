@@ -142,6 +142,15 @@ void stepper_init(stepper_motor_t *motor) {
   stepper_set_coils(motor, half_step_sequence, STEPPER_SEQUENCE_SIZE, 0);
 }
 
+void stepper_deinit(stepper_motor_t *motor) {
+  for (int i = 0; i < 4; i++) {
+    HAL_GPIO_WritePin(motor->coil_ports[i], motor->coil_pins[i],
+                      GPIO_PIN_RESET);
+  }
+  // Optionally reset the current step index.
+  motor->current_step = 0;
+}
+
 void stepper_half_step(stepper_motor_t *motor, int steps, uint32_t delay_ms) {
   stepper_do_steps(motor, steps, delay_ms, half_step_sequence,
                    STEPPER_SEQUENCE_SIZE);

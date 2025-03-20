@@ -128,6 +128,7 @@ int main(void)
   // stepper_init(&stepper3);
   // stepper_init(&stepper4);
   // stepper_init(&stepper5);
+  // // Create stepper motor array.
   // stepper_motor_t *steppers[5] = {&stepper1, &stepper2, &stepper3, &stepper4,
   //                                 &stepper5};
   // // Red LED.
@@ -139,9 +140,15 @@ int main(void)
   // // Blue LED.
   // ws2812b_set_colour(0, 0, 0, 6);
   // ws2812b_update();
-  // // Step forward.
+  // // Step reverse.
   // int steps_2[5] = {-2048, -2048, -2048, -2048, -2048};
   // stepper_multi_full_step(steppers, steps_2, 5, 1);
+  // // Deinitialize the stepper motors.
+  // stepper_deinit(&stepper1);
+  // stepper_deinit(&stepper2);
+  // stepper_deinit(&stepper3);
+  // stepper_deinit(&stepper4);
+  // stepper_deinit(&stepper5);
 
   ws2812b_set_colour(0, 4, 1, 1); // Very dim purple.
   ws2812b_update();
