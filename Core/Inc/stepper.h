@@ -91,6 +91,17 @@ extern stepper_motor_t stepper5;
 void stepper_init(stepper_motor_t *motor);
 
 /**
+ * @brief Deinitialize the stepper motor, de-energizing all coils.
+ *
+ * @param motor Pointer to the stepper_motor_t instance to deinitialize.
+ *
+ * This function sets all the coil pins of the stepper motor to low
+ * (GPIO_PIN_RESET) to ensure that the coils are de-energized, reducing current
+ * consumption.
+ */
+void stepper_deinit(stepper_motor_t *motor);
+
+/**
  * @brief Move the motor using half-step mode (8-step sequence).
  *
  * @param motor Pointer to the motor instance.
