@@ -156,10 +156,8 @@ int main(void)
   // ADS114S08 setup.
   ads114s08_init();
 
-  uint16_t data[12] = {0};
   // vl53l4cd_init();
   while (1) {
-    ads114s08_all_read_data(0x06, data);
     // vl53l4cd_get_data();
     /* USER CODE END WHILE */
 

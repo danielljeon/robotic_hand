@@ -26,6 +26,9 @@ extern SPI_HandleTypeDef hspi3;
 #define ADS114S08_START_SYNC_PORT GPIOA
 #define ADS114S08_START_SYNC_PIN GPIO_PIN_11
 
+#define ADS114S08_DRDY_PORT GPIOD
+#define ADS114S08_DRDY_PIN GPIO_PIN_2
+
 /** Public functions. *********************************************************/
 
 /**
