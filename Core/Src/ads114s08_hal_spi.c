@@ -126,6 +126,8 @@ void ads114s08_write_register(const uint8_t address, const uint8_t value) {
 void ads114s08_init(void) {
   uint8_t rx_buffer[1] = {0};
 
+  HAL_Delay(3); // Wait at least 2.2 ms for power stabilization.
+
   // Tie the START/SYNC pin to DGND to control conversions by commands.
   HAL_GPIO_WritePin(ADS114S08_START_SYNC_PORT, ADS114S08_START_SYNC_PIN,
                     GPIO_PIN_RESET);
@@ -189,11 +191,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
       return;
     }
 
-    // Read current channel data.
+    // Transmit read data command with unified SPI CS.
     uint8_t rx_buffer[3];
-    ads114s08_write_command(ADS114S08_CMD_RDATA);
-    HAL_SPI_Receive(&ADS114S08_HSPI, rx_buffer, 3, HAL_MAX_DELAY);
+    uint8_t command = ADS114S08_CMD_RDATA;
 
+    ads114s08_select();
+    HAL_SPI_Transmit(&ADS114S08_HSPI, &command, 1, HAL_MAX_DELAY);
+    HAL_SPI_Receive(&ADS114S08_HSPI, rx_buffer, 3, HAL_MAX_DELAY);
+    ads114s08_deselect();
+
+    // Bit merge result.
     int32_t raw = ((int32_t)rx_buffer[0] << 16) | ((int32_t)rx_buffer[1] << 8) |
                   (int32_t)rx_buffer[2];
 
