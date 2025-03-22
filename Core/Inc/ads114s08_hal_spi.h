@@ -11,7 +11,6 @@
 /** Includes. *****************************************************************/
 
 #include "stm32f4xx_hal.h"
-#include <stdint.h>
 
 /** STM32 Port and Pin Configurations. ****************************************/
 
@@ -28,6 +27,10 @@ extern SPI_HandleTypeDef hspi3;
 
 #define ADS114S08_DRDY_PORT GPIOD
 #define ADS114S08_DRDY_PIN GPIO_PIN_2
+
+/** Public variables. *********************************************************/
+
+extern uint16_t channel_data[9]; // Final readings per channel.
 
 /** Public functions. *********************************************************/
 
@@ -68,13 +71,5 @@ void ads114s08_write_register(uint8_t address, uint8_t value);
  * @brief Initializes the ADS114S08 ADC.
  */
 void ads114s08_init(void);
-
-/**
- * @brief Reads all single ended ADC data from the ADS114S08.
- *
- * @param neg_ain The negative reference AIN to compare against.
- * @param data 12 element 16-bit array to store ADC values.
- */
-void ads114s08_all_read_data(uint8_t neg_ain, uint16_t *data);
 
 #endif

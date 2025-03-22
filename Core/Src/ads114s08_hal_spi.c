@@ -8,6 +8,7 @@
 /** Includes. *****************************************************************/
 
 #include "ads114s08_hal_spi.h"
+#include <stdbool.h>
 
 /** ADS114S08 constants. ******************************************************/
 
@@ -27,27 +28,39 @@
 #define ADS114S08_SYS_REGISTER 0x09
 
 // Analog input channel definitions.
-#define NUM_CHANNELS 12 // 12 AIN channels.
-#define AIN0 0x00       // 0000: AIN0 (default).
-#define AIN1 0x01       // 0001: AIN1.
-#define AIN2 0x02       // 0010: AIN2.
-#define AIN3 0x03       // 0011: AIN3.
-#define AIN4 0x04       // 0100: AIN4.
-#define AIN5 0x05       // 0101: AIN5.
-#define AIN6 0x06       // 0110: AIN6 (ADS114S08 only).
-#define AIN7 0x07       // 0111: AIN7 (ADS114S08 only).
-#define AIN8 0x08       // 1000: AIN8 (ADS114S08 only).
-#define AIN9 0x09       // 1001: AIN9 (ADS114S08 only).
-#define AIN10 0x0A      // 1010: AIN10 (ADS114S08 only).
-#define AIN11 0x0B      // 1011: AIN11 (ADS114S08 only).
-#define AINCOM 0x0C     // 1100: AINCOM.
+#define AIN0 0x00   // 0000: AIN0 (default).
+#define AIN1 0x01   // 0001: AIN1.
+#define AIN2 0x02   // 0010: AIN2.
+#define AIN3 0x03   // 0011: AIN3.
+#define AIN4 0x04   // 0100: AIN4.
+#define AIN5 0x05   // 0101: AIN5.
+#define AIN6 0x06   // 0110: AIN6 (ADS114S08 only).
+#define AIN7 0x07   // 0111: AIN7 (ADS114S08 only).
+#define AIN8 0x08   // 1000: AIN8 (ADS114S08 only).
+#define AIN9 0x09   // 1001: AIN9 (ADS114S08 only).
+#define AIN10 0x0A  // 1010: AIN10 (ADS114S08 only).
+#define AIN11 0x0B  // 1011: AIN11 (ADS114S08 only).
+#define AINCOM 0x0C // 1100: AINCOM.
+
+// Configured negative (GND) reference channel.
+#define NEG_AIN AIN6
+
+// Channels to monitor without including reference pin.
+#define NUM_CHANNELS 9 // 12 AIN channels total.
+
+// Channels to monitor array.
+const uint8_t channels[NUM_CHANNELS] = {AIN0, AIN1, AIN2,  AIN3, AIN4,
+                                        AIN8, AIN9, AIN10, AIN11};
 
 /** Private Variables. ********************************************************/
 
-const uint8_t channels[NUM_CHANNELS] = {AIN0, AIN1, AIN2, AIN3, AIN4,  AIN5,
-                                        AIN6, AIN7, AIN8, AIN9, AIN10, AIN11};
+volatile bool ads114s08_is_init = false;    // Flag tracks if init is complete.
+volatile uint8_t current_channel_index = 0; // Tracks current channel.
+volatile bool mux_settling = false;
 
-uint16_t data[12] = {0}; // TODO.
+/** Public Variables. *********************************************************/
+
+uint16_t channel_data[NUM_CHANNELS];
 
 /** Private Functions. ********************************************************/
 
@@ -117,6 +130,9 @@ void ads114s08_init(void) {
   HAL_GPIO_WritePin(ADS114S08_START_SYNC_PORT, ADS114S08_START_SYNC_PIN,
                     GPIO_PIN_RESET);
 
+  // Tie the CS pin to DGND.
+  HAL_GPIO_WritePin(ADS114S08_CS_PORT, ADS114S08_CS_PIN, GPIO_PIN_RESET);
+
   // Tie the RESET pin to IOVDD if the RESET pin is not used.
   HAL_GPIO_WritePin(ADS114S08_NRESET_PORT, ADS114S08_NRESET_PIN, GPIO_PIN_SET);
 
@@ -146,7 +162,7 @@ void ads114s08_init(void) {
 
       // Project specific configuration.
       // Configure reference input selection as REFP1, REFN1.
-      ads114s08_write_register(ADS114S08_REF_REGISTER, 0x14);
+      ads114s08_write_register(ADS114S08_REF_REGISTER, 0x04);
 
       // Start ADC conversions.
       ads114s08_write_command(ADS114S08_CMD_START);
@@ -158,26 +174,48 @@ void ads114s08_init(void) {
   } else { // Device ID does not match expected.
     // Handle error: device ID does not match.
   }
+
+  ads114s08_is_init = true; // Flag initialization as complete.
 }
 
-void ads114s08_all_read_data(const uint8_t neg_ain, uint16_t *data) {
-  uint8_t rx_buffer[4] = {0};
-  uint8_t tx_buffer = 0;
-
-  for (uint8_t i = 0; i < 12; i++) {
-    if (neg_ain != channels[i]) { // Not using itself as AIN reference.
-      tx_buffer = (uint8_t)(((uint16_t)(channels[i] << 4) & 0xF0) |
-                            (uint16_t)(neg_ain & 0x0F));
-      ads114s08_write_register(ADS114S08_INPMUX_REGISTER, tx_buffer);
-      ads114s08_read_register(ADS114S08_CMD_RDATA, rx_buffer, 4);
-      data[i] = ((uint16_t)rx_buffer[1] << 8) | rx_buffer[2];
-
-    } else { // Using itself as AIN reference, ADC assumed zero.
-      data[i] = 0;
-    }
-  }
-}
+/** Override Functions. *******************************************************/
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-  ads114s08_all_read_data(0x07, data);
+  if (GPIO_Pin == ADS114S08_DRDY_PIN && ads114s08_is_init) {
+
+    if (mux_settling) {
+      // First DRDY after mux change is settling, skip reading.
+      mux_settling = false;
+      return;
+    }
+
+    // Read current channel data.
+    uint8_t rx_buffer[3];
+    ads114s08_write_command(ADS114S08_CMD_RDATA);
+    HAL_SPI_Receive(&ADS114S08_HSPI, rx_buffer, 3, HAL_MAX_DELAY);
+
+    int32_t raw = ((int32_t)rx_buffer[0] << 16) | ((int32_t)rx_buffer[1] << 8) |
+                  (int32_t)rx_buffer[2];
+
+    // Sign-extend 24-bit value.
+    if (raw & 0x800000) {
+      raw |= 0xFF000000;
+    }
+
+    channel_data[current_channel_index] = (uint16_t)((raw >> 8) & 0xFFFF);
+
+    // Advance to next channel.
+    current_channel_index++;
+    if (current_channel_index >= NUM_CHANNELS)
+      current_channel_index = 0;
+
+    // Configure MUX.
+    const uint8_t mux =
+        ((channels[current_channel_index] << 4) & 0xF0) | (NEG_AIN & 0x0F);
+    ads114s08_write_register(ADS114S08_INPMUX_REGISTER, mux);
+
+    // Restart conversion to ensure DRDY toggles.
+    ads114s08_write_command(ADS114S08_CMD_START);
+    mux_settling = true;
+  }
 }
