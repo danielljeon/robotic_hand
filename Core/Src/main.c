@@ -25,6 +25,9 @@
 #include "stepper.h"
 #include "vl53l4cd_runner.h"
 #include "ws2812b_hal_pwm.h"
+#include "xbee_api_hal_uart.h"
+#include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -157,8 +160,25 @@ int main(void)
   ads114s08_init();
 
   // vl53l4cd_init();
+
+  // uint32_t index = 0; // TODO DEBUG ONLY!
   while (1) {
     // vl53l4cd_get_data();
+
+    // // Transmit data via UART. TODO DEBUG ONLY!
+    // if (index == 1000000) {
+    //   char xbee_buffer[100];
+    //   sprintf(xbee_buffer, "1:%d,2:%d,3:%d,4:%d,5:%d,6:%d,7:%d,8:%d,9:%d\n",
+    //           channel_data[0], channel_data[1], channel_data[2],
+    //           channel_data[3], channel_data[4], channel_data[5],
+    //           channel_data[6], channel_data[7], channel_data[8]);
+    //   HAL_UART_Transmit(&huart1, xbee_buffer, strlen(xbee_buffer),
+    //                     HAL_MAX_DELAY);
+    // } else if (index > 1000000) {
+    //   index = 0;
+    // }
+    // index += 1;
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -458,7 +478,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 9600;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
