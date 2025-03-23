@@ -21,13 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "ads114s08_hal_spi.h"
-#include "stepper.h"
-#include "vl53l4cd_runner.h"
-#include "ws2812b_hal_pwm.h"
-#include "xbee_api_hal_uart.h"
-#include <stdio.h>
-#include <string.h>
+#include "init.h"
+#include "run.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -124,68 +119,10 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  // WS2812B setup.
-  ws2812b_init();
+  init();
 
-  // // Initialize the stepper motors.
-  // stepper_init(&stepper1);
-  // stepper_init(&stepper2);
-  // stepper_init(&stepper3);
-  // stepper_init(&stepper4);
-  // stepper_init(&stepper5);
-  // // Create stepper motor array.
-  // stepper_motor_t *steppers[5] = {&stepper1, &stepper2, &stepper3, &stepper4,
-  //                                 &stepper5};
-  // // Red LED.
-  // ws2812b_set_colour(0, 6, 0, 0);
-  // ws2812b_update();
-  // // Step forward.
-  // int steps_1[5] = {2048, 2048, 2048, 2048, 2048};
-  // stepper_multi_full_step(steppers, steps_1, 5, 1);
-  // // Blue LED.
-  // ws2812b_set_colour(0, 0, 0, 6);
-  // ws2812b_update();
-  // // Step reverse.
-  // int steps_2[5] = {-2048, -2048, -2048, -2048, -2048};
-  // stepper_multi_full_step(steppers, steps_2, 5, 1);
-  // // Deinitialize the stepper motors.
-  // stepper_deinit(&stepper1);
-  // stepper_deinit(&stepper2);
-  // stepper_deinit(&stepper3);
-  // stepper_deinit(&stepper4);
-  // stepper_deinit(&stepper5);
-
-  ws2812b_set_colour(0, 4, 1, 1); // Very dim purple.
-  ws2812b_update();
-
-  // ADS114S08 setup.
-  ads114s08_init();
-
-  // vl53l4cd_init();
-
-//  uint32_t index = 0; // TODO DEBUG ONLY!
   while (1) {
-    // vl53l4cd_get_data();
-
-//    // Transmit data via UART. TODO DEBUG ONLY!
-//    if (index == 1000000) {
-//      char xbee_buffer[100];
-//      sprintf(xbee_buffer, "1:%d,2:%d,3:%d,4:%d,5:%d,6:%d,7:%d,8:%d,9:%d\n",
-//              channel_data[0], channel_data[1], channel_data[2],
-//              channel_data[3], channel_data[4], channel_data[5],
-//              channel_data[6], channel_data[7], channel_data[8]);
-//      // Simple UART transmit.
-//      HAL_UART_Transmit(&huart1, (const uint8_t *) xbee_buffer,
-//                        strlen(xbee_buffer),
-//                        HAL_MAX_DELAY);
-//      // XBee transmit.
-//      send(0x0123456789ABCDEF, 0xFFFE, (const uint8_t *) xbee_buffer,
-//           strlen(xbee_buffer), 0);
-//
-//    } else if (index > 1000000) {
-//      index = 0;
-//    }
-//    index += 1;
+    run();
 
     /* USER CODE END WHILE */
 
@@ -340,9 +277,9 @@ static void MX_SPI3_Init(void)
   hspi3.Init.Direction = SPI_DIRECTION_2LINES;
   hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi3.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi3.Init.NSS = SPI_NSS_SOFT;
-  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
