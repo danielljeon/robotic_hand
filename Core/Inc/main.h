@@ -61,7 +61,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define EXTI4_INT_BNO085_Pin GPIO_PIN_4
 #define EXTI4_INT_BNO085_GPIO_Port GPIOA
-#define EXTI4_INT_BNO085_EXTI_IRQn EXTI4_IRQn
 #define SPI1_SCK_BNO085_Pin GPIO_PIN_5
 #define SPI1_SCK_BNO085_GPIO_Port GPIOA
 #define SPI1_MISO_BNO085_Pin GPIO_PIN_6

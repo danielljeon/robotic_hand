@@ -204,7 +204,7 @@ void ads114s08_init(void) {
 
 /** Override Functions. *******************************************************/
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+void HAL_GPIO_EXTI_Callback_ads114s08(uint16_t GPIO_Pin) {
   if (GPIO_Pin == ADS114S08_DRDY_PIN && ads114s08_is_init) {
     ads114s08_select(); // Bring CS pin low.
 

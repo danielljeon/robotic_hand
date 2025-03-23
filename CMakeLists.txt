@@ -52,6 +52,7 @@ endif ()
 # Include directories.
 include_directories(
         Core/Inc Drivers/STM32F4xx_HAL_Driver/Inc Drivers/STM32F4xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32F4xx/Include Drivers/CMSIS/Include
+        "Core/sh2"
         "Core/VL53L4CD_ULD_Driver"
 )
 

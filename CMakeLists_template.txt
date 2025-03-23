@@ -51,6 +51,7 @@ endif ()
 # Include directories.
 include_directories(
         ${includes}
+        "Core/sh2"
         "Core/VL53L4CD_ULD_Driver"
 )
 

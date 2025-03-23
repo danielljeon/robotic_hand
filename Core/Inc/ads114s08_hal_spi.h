@@ -32,6 +32,10 @@ extern SPI_HandleTypeDef hspi3;
 
 extern uint16_t channel_data[9]; // Final readings per channel.
 
+/** User implementations of STM32 NVIC HAL (overwriting HAL). *****************/
+
+void HAL_GPIO_EXTI_Callback_ads114s08(uint16_t GPIO_Pin);
+
 /** Public functions. *********************************************************/
 
 /**
