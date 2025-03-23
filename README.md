@@ -52,7 +52,7 @@ repo: [robotic_hand_pcb](https://github.com/danielljeon/robotic_hand_pcb).
 
 ![robotic_hand.drawio.png](docs/robotic_hand.drawio.png)
 
-> Drawio file here: [robotic_hand.drawio](docs/robotic_hand.drawio)
+> Drawio file here: [robotic_hand.drawio](docs/robotic_hand.drawio).
 
 ### 1.3 Pin Configurations
 
@@ -153,6 +153,14 @@ The datasheet specifies the use of SPI mode 1:
 
 - CPOL = 0 (low).
 - CPHA = 1 (2nd edge).
+
+Clock rate is limited to approximately less than 10 MHz. Given that SPI2 runs on
+the APB1 bus clock (45 MHz), and the prescaler values are powers of 2 (2, 4, 8,
+etc.):
+
+$$Clock = \frac{Source}{PSC} = \frac{ 45 \space \mathrm{MHz} }{ 8 } = 5.625 \space \mathrm{MHz}$$
+
+Final clock rate is 5.625 MHz.
 
 ### 2.3 Nested Vectored Interrupt Controller (NVIC)
 
