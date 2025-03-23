@@ -123,8 +123,8 @@ int main(void)
   init();
 
   while (1) {
+    // bno085_run(); // TODO: WIP Implementation.
     run();
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

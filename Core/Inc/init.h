@@ -10,6 +10,7 @@
 /** Includes. *****************************************************************/
 
 #include "ads114s08_hal_spi.h"
+#include "bno085_runner.h"
 #include "scheduler.h"
 #include "stepper.h"
 #include "vl53l4cd_runner.h"
