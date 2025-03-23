@@ -56,7 +56,7 @@ const uint8_t channels[NUM_CHANNELS] = {AIN0, AIN1, AIN2,  AIN3, AIN4,
 
 volatile bool ads114s08_is_init = false;    // Flag tracks if init is complete.
 volatile uint8_t current_channel_index = 0; // Tracks current channel.
-volatile bool mux_settling = false;
+volatile bool mux_settling = false;         // Flag tracks channel mux state.
 
 /** Public Variables. *********************************************************/
 
@@ -78,8 +78,19 @@ static void ads114s08_deselect(void) {
   HAL_GPIO_WritePin(ADS114S08_CS_PORT, ADS114S08_CS_PIN, GPIO_PIN_SET);
 }
 
-/** Public Functions. *********************************************************/
-
+/**
+ * @brief Reads a single register from the ADS114S08 ADC.
+ *
+ * @param address The register address to be read.
+ * @param rx_buffer The RX data byte buffer.
+ * @param rx_length The number of bytes to be read.
+ *
+ * This function constructs the read register command by combining the
+ * ADS114S08_CMD_RREG command with the register address and then retrieves
+ * the value from the ADC.
+ *
+ * @note SPI CS pin must be controlled externally.
+ */
 void ads114s08_read_register(const uint8_t address, uint8_t *rx_buffer,
                              const uint8_t rx_length) {
   uint8_t cmd[2] = {0};
@@ -93,18 +104,33 @@ void ads114s08_read_register(const uint8_t address, uint8_t *rx_buffer,
   cmd[0] = ADS114S08_CMD_RREG | (address & 0x1F);
   cmd[1] = (rx_length - 1) & 0x1F;
 
-  ads114s08_select();
   HAL_SPI_Transmit(&ADS114S08_HSPI, cmd, 2, HAL_MAX_DELAY);
   HAL_SPI_Receive(&ADS114S08_HSPI, rx_buffer, rx_length, HAL_MAX_DELAY);
-  ads114s08_deselect();
 }
 
+/**
+ * @brief Writes a command to the ADS114S08.
+ *
+ * @param cmd The command byte to send.
+ *
+ * @note SPI CS pin must be controlled externally.
+ */
 void ads114s08_write_command(const uint8_t cmd) {
-  ads114s08_select();
   HAL_SPI_Transmit(&ADS114S08_HSPI, &cmd, 1, HAL_MAX_DELAY);
-  ads114s08_deselect();
 }
 
+/**
+ * @brief Writes a value to a register in the ADS114S08.
+ *
+ * @param address The register address to write to.
+ * @param value The value to be written.
+ *
+ * This function constructs the write register command by combining the
+ * ADS114S08_CMD_WREG command with the register address and then sends the
+ * value to be written.
+ *
+ * @note SPI CS pin must be controlled externally.
+ */
 void ads114s08_write_register(const uint8_t address, const uint8_t value) {
   uint8_t cmdBuffer[3] = {0};
 
@@ -118,13 +144,17 @@ void ads114s08_write_register(const uint8_t address, const uint8_t value) {
   cmdBuffer[1] = 0x00;
   cmdBuffer[2] = value;
 
-  ads114s08_select();
   HAL_SPI_Transmit(&ADS114S08_HSPI, cmdBuffer, 3, HAL_MAX_DELAY);
-  ads114s08_deselect();
 }
+
+/** Public Functions. *********************************************************/
 
 void ads114s08_init(void) {
   uint8_t rx_buffer[1] = {0};
+
+  // Hardware reset on startup.
+  HAL_GPIO_WritePin(ADS114S08_NRESET_PORT, ADS114S08_NRESET_PIN,
+                    GPIO_PIN_RESET);
 
   HAL_Delay(3); // Wait at least 2.2 ms for power stabilization.
 
@@ -132,50 +162,42 @@ void ads114s08_init(void) {
   HAL_GPIO_WritePin(ADS114S08_START_SYNC_PORT, ADS114S08_START_SYNC_PIN,
                     GPIO_PIN_RESET);
 
-  // Tie the CS pin to DGND.
-  HAL_GPIO_WritePin(ADS114S08_CS_PORT, ADS114S08_CS_PIN, GPIO_PIN_RESET);
-
-  // Tie the RESET pin to IOVDD if the RESET pin is not used.
+  // Tie the RESET pin to IOVDD if the RESET pin is not used (going further).
   HAL_GPIO_WritePin(ADS114S08_NRESET_PORT, ADS114S08_NRESET_PIN, GPIO_PIN_SET);
-
-  // Initialize SPI CS.
-  ads114s08_deselect();
 
   HAL_Delay(3); // Wait at least 2.2 ms for power stabilization.
 
+  ads114s08_select(); // Bring CS pin low.
+
+  HAL_Delay(1); // Wait td(CSSC) = 20 ns.
+
   // Reset the device.
-  ads114s08_write_command(ADS114S08_CMD_RESET);
-  HAL_Delay(5); // Wait for reset to complete.
+  HAL_SPI_Transmit(&ADS114S08_HSPI, (const uint8_t *)ADS114S08_CMD_RESET, 1,
+                   HAL_MAX_DELAY);
 
-  // Read device ID.
-  ads114s08_read_register(ADS114S08_ID_REGISTER, rx_buffer, 1);
-  HAL_Delay(1);
+  HAL_Delay(5); // Wait 4096 * tCLK.
 
-  // Check expected device ID.
-  if ((rx_buffer[0] & 0x7) == ADS114S08_DEVICE_ID) {
+  // Read the status register to check the RDY bit.
+  uint8_t nrdy[1] = {0};
 
-    // Read the status register to check the RDY bit.
-    uint8_t nrdy[1] = {0};
-    ads114s08_read_register(ADS114S08_STATUS_REGISTER, nrdy, 1);
+  // Read status register.
+  ads114s08_read_register(ADS114S08_STATUS_REGISTER, nrdy, 1);
 
-    if ((nrdy[0] & 0x40) == 0) { // Device is ready.
-      // Clear the FL_POR flag by writing to the status register if needed.
-      ads114s08_write_register(ADS114S08_SYS_REGISTER, 0x0);
+  if ((nrdy[0] & 0x40) == 0) { // Device is ready.
+    // Clear the FL_POR flag by writing to the status register if needed.
+    ads114s08_write_register(ADS114S08_SYS_REGISTER, 0x0);
 
-      // Project specific configuration.
-      // Configure reference input selection as REFP1, REFN1.
-      ads114s08_write_register(ADS114S08_REF_REGISTER, 0x04);
+    // Configure reference input selection as REFP1, REFN1.
+    ads114s08_write_register(ADS114S08_REF_REGISTER, 0x04);
 
-      // Start ADC conversions.
-      ads114s08_write_command(ADS114S08_CMD_START);
+    // Start ADC conversions.
+    ads114s08_write_command(ADS114S08_CMD_START);
 
-    } else { // Device not ready.
-      // Handle error: device not ready.
-    }
-
-  } else { // Device ID does not match expected.
-    // Handle error: device ID does not match.
+  } else { // Device not ready.
+    // Handle error: device not ready.
   }
+
+  ads114s08_deselect(); // Bring CS pin high.
 
   ads114s08_is_init = true; // Flag initialization as complete.
 }
@@ -184,37 +206,35 @@ void ads114s08_init(void) {
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == ADS114S08_DRDY_PIN && ads114s08_is_init) {
+    ads114s08_select(); // Bring CS pin low.
 
     if (mux_settling) {
       // First DRDY after mux change is settling, skip reading.
       mux_settling = false;
+      ads114s08_deselect(); // Bring CS pin high.
       return;
     }
 
     // Transmit read data command with unified SPI CS.
     uint8_t rx_buffer[3];
-    uint8_t command = ADS114S08_CMD_RDATA;
 
-    ads114s08_select();
-    HAL_SPI_Transmit(&ADS114S08_HSPI, &command, 1, HAL_MAX_DELAY);
+    ads114s08_select(); // Bring CS pin low.
+
+    ads114s08_write_command(ADS114S08_CMD_RDATA);
     HAL_SPI_Receive(&ADS114S08_HSPI, rx_buffer, 3, HAL_MAX_DELAY);
-    ads114s08_deselect();
 
-    // Bit merge result.
-    int32_t raw = ((int32_t)rx_buffer[0] << 16) | ((int32_t)rx_buffer[1] << 8) |
-                  (int32_t)rx_buffer[2];
+    ads114s08_deselect(); // Bring CS pin high.
 
-    // Sign-extend 24-bit value.
-    if (raw & 0x800000) {
-      raw |= 0xFF000000;
-    }
-
-    channel_data[current_channel_index] = (uint16_t)((raw >> 8) & 0xFFFF);
+    // Store result.
+    channel_data[current_channel_index] =
+        ((uint16_t)rx_buffer[0] << 8) | ((uint16_t)rx_buffer[1]);
 
     // Advance to next channel.
     current_channel_index++;
     if (current_channel_index >= NUM_CHANNELS)
       current_channel_index = 0;
+
+    ads114s08_select(); // Bring CS pin low.
 
     // Configure MUX.
     const uint8_t mux =
@@ -223,6 +243,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
     // Restart conversion to ensure DRDY toggles.
     ads114s08_write_command(ADS114S08_CMD_START);
+
+    ads114s08_deselect(); // Bring CS pin high.
+
     mux_settling = true;
   }
 }
