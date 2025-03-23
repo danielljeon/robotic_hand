@@ -56,6 +56,8 @@ TIM_HandleTypeDef htim5;
 DMA_HandleTypeDef hdma_tim1_ch1;
 
 UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
 
@@ -161,23 +163,29 @@ int main(void)
 
   // vl53l4cd_init();
 
-  // uint32_t index = 0; // TODO DEBUG ONLY!
+//  uint32_t index = 0; // TODO DEBUG ONLY!
   while (1) {
     // vl53l4cd_get_data();
 
-    // // Transmit data via UART. TODO DEBUG ONLY!
-    // if (index == 1000000) {
-    //   char xbee_buffer[100];
-    //   sprintf(xbee_buffer, "1:%d,2:%d,3:%d,4:%d,5:%d,6:%d,7:%d,8:%d,9:%d\n",
-    //           channel_data[0], channel_data[1], channel_data[2],
-    //           channel_data[3], channel_data[4], channel_data[5],
-    //           channel_data[6], channel_data[7], channel_data[8]);
-    //   HAL_UART_Transmit(&huart1, xbee_buffer, strlen(xbee_buffer),
-    //                     HAL_MAX_DELAY);
-    // } else if (index > 1000000) {
-    //   index = 0;
-    // }
-    // index += 1;
+//    // Transmit data via UART. TODO DEBUG ONLY!
+//    if (index == 1000000) {
+//      char xbee_buffer[100];
+//      sprintf(xbee_buffer, "1:%d,2:%d,3:%d,4:%d,5:%d,6:%d,7:%d,8:%d,9:%d\n",
+//              channel_data[0], channel_data[1], channel_data[2],
+//              channel_data[3], channel_data[4], channel_data[5],
+//              channel_data[6], channel_data[7], channel_data[8]);
+//      // Simple UART transmit.
+//      HAL_UART_Transmit(&huart1, (const uint8_t *) xbee_buffer,
+//                        strlen(xbee_buffer),
+//                        HAL_MAX_DELAY);
+//      // XBee transmit.
+//      send(0x0123456789ABCDEF, 0xFFFE, (const uint8_t *) xbee_buffer,
+//           strlen(xbee_buffer), 0);
+//
+//    } else if (index > 1000000) {
+//      index = 0;
+//    }
+//    index += 1;
 
     /* USER CODE END WHILE */
 
@@ -508,6 +516,12 @@ static void MX_DMA_Init(void)
   /* DMA2_Stream1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+  /* DMA2_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+  /* DMA2_Stream7_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream7_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 
 }
 
