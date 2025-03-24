@@ -30,7 +30,7 @@ extern SPI_HandleTypeDef hspi3;
 
 /** Public variables. *********************************************************/
 
-extern uint16_t channel_data[9]; // Final readings per channel.
+extern uint16_t channel_data[12]; // Final readings per channel.
 
 /** User implementations of STM32 NVIC HAL (overwriting HAL). *****************/
 

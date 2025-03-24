@@ -43,13 +43,13 @@
 #define AINCOM 0x0C // 1100: AINCOM.
 
 // Configured negative (GND) reference channel.
-#define NEG_AIN AIN6
+#define NEG_AIN AINCOM
 
 // Channels to monitor without including reference pin.
-#define NUM_CHANNELS 9 // 12 AIN channels total.
+#define NUM_CHANNELS 12 // 12 AIN channels total.
 
 // Channels to monitor array.
-const uint8_t channels[NUM_CHANNELS] = {AIN0, AIN1, AIN2,  AIN3, AIN4,
+const uint8_t channels[NUM_CHANNELS] = {AIN0, AIN1, AIN2,  AIN3, AIN4, AIN5, AIN6, AIN7,
                                         AIN8, AIN9, AIN10, AIN11};
 
 /** Private Variables. ********************************************************/
@@ -150,8 +150,6 @@ void ads114s08_write_register(const uint8_t address, const uint8_t value) {
 /** Public Functions. *********************************************************/
 
 void ads114s08_init(void) {
-  uint8_t rx_buffer[1] = {0};
-
   // Hardware reset on startup.
   HAL_GPIO_WritePin(ADS114S08_NRESET_PORT, ADS114S08_NRESET_PIN,
                     GPIO_PIN_RESET);
@@ -187,8 +185,8 @@ void ads114s08_init(void) {
     // Clear the FL_POR flag by writing to the status register if needed.
     ads114s08_write_register(ADS114S08_SYS_REGISTER, 0x0);
 
-    // Configure reference input selection as REFP1, REFN1.
-    ads114s08_write_register(ADS114S08_REF_REGISTER, 0x04);
+    // Configure reference input selection as REFP0, REFN0.
+    ads114s08_write_register(ADS114S08_REF_REGISTER, 0x00);
 
     // Start ADC conversions.
     ads114s08_write_command(ADS114S08_CMD_START);

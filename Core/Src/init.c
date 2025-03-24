@@ -35,7 +35,7 @@ void sequential_transmit_sensor_data(void) {
 
   // Reset index if out of bounds.
   if (xbee_sensor_data_transmit_index < 0 ||
-      xbee_sensor_data_transmit_index > 7) {
+      xbee_sensor_data_transmit_index > 6) {
     xbee_sensor_data_transmit_index = 0;
   }
 
@@ -67,10 +67,10 @@ void sequential_transmit_sensor_data(void) {
             bno085_gravity_y, bno085_gravity_z);
     break;
   case 6:
-    sprintf(data, "1=%d,2=%d,3=%d,4=%d,J8=%d,J12=%d,J13=%d,J14=%d,9=%d\n",
+    sprintf(data, "1=%d,2=%d,3=%d,4=%d,J8=%d,J9=%d,J10=%d,J11=%d,J12=%d,J13=%d,J14=%d,11=%d\n",
             channel_data[0], channel_data[1], channel_data[2], channel_data[3],
             channel_data[4], channel_data[5], channel_data[6], channel_data[7],
-            channel_data[8]);
+            channel_data[8], channel_data[9], channel_data[10], channel_data[11]);
     break;
   default:
     xbee_sensor_data_transmit_index = 0;
@@ -81,7 +81,7 @@ void sequential_transmit_sensor_data(void) {
   transmit_sensor_data(data);
 
   // Increment the index and wrap around.
-  xbee_sensor_data_transmit_index = (xbee_sensor_data_transmit_index + 1) % 8;
+  xbee_sensor_data_transmit_index = (xbee_sensor_data_transmit_index + 1) % 7;
 }
 
 /** Public functions. *********************************************************/
