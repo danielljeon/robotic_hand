@@ -248,6 +248,7 @@ robotic_hand_state_t handle_state_read_analog(void) {
 
 robotic_hand_state_t handle_state_read_imu(void) {
   // bno085_run(); // TODO: WIP Implementation.
+  read_imu_flag = false; // TODO: WIP Implementation. (Remove to use this state).
 
   if (!read_imu_flag) { // Once update flag is reset, move to next state.
     // State exit actions.
