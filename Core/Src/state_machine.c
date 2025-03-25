@@ -118,11 +118,76 @@ stepper_motor_t pinky_stepper = {
     .current_step = 0};
 
 // PID controller declarations.
-pid_controller_t thumb_pid_controller = {0};
-pid_controller_t index_pid_controller = {0};
-pid_controller_t middle_pid_controller = {0};
-pid_controller_t ring_pid_controller = {0};
-pid_controller_t pinky_pid_controller = {0};
+pid_controller_t thumb_pid_controller = {.k_p = 0,
+                                         .k_i = 0,
+                                         .k_d = 0,
+                                         .tau = 0,
+                                         .output_min = 0,
+                                         .output_max = 0,
+                                         .integral_min = 0,
+                                         .integral_max = 0,
+                                         .T = 0,
+                                         .integrator = 0,
+                                         .prev_error = 0,
+                                         .differentiator = 0,
+                                         .prev_measurement = 0,
+                                         .out = 0};
+pid_controller_t index_pid_controller = {.k_p = 0,
+                                         .k_i = 0,
+                                         .k_d = 0,
+                                         .tau = 0,
+                                         .output_min = 0,
+                                         .output_max = 0,
+                                         .integral_min = 0,
+                                         .integral_max = 0,
+                                         .T = 0,
+                                         .integrator = 0,
+                                         .prev_error = 0,
+                                         .differentiator = 0,
+                                         .prev_measurement = 0,
+                                         .out = 0};
+pid_controller_t middle_pid_controller = {.k_p = 0,
+                                          .k_i = 0,
+                                          .k_d = 0,
+                                          .tau = 0,
+                                          .output_min = 0,
+                                          .output_max = 0,
+                                          .integral_min = 0,
+                                          .integral_max = 0,
+                                          .T = 0,
+                                          .integrator = 0,
+                                          .prev_error = 0,
+                                          .differentiator = 0,
+                                          .prev_measurement = 0,
+                                          .out = 0};
+pid_controller_t ring_pid_controller = {.k_p = 0,
+                                        .k_i = 0,
+                                        .k_d = 0,
+                                        .tau = 0,
+                                        .output_min = 0,
+                                        .output_max = 0,
+                                        .integral_min = 0,
+                                        .integral_max = 0,
+                                        .T = 0,
+                                        .integrator = 0,
+                                        .prev_error = 0,
+                                        .differentiator = 0,
+                                        .prev_measurement = 0,
+                                        .out = 0};
+pid_controller_t pinky_pid_controller = {.k_p = 0,
+                                         .k_i = 0,
+                                         .k_d = 0,
+                                         .tau = 0,
+                                         .output_min = 0,
+                                         .output_max = 0,
+                                         .integral_min = 0,
+                                         .integral_max = 0,
+                                         .T = 0,
+                                         .integrator = 0,
+                                         .prev_error = 0,
+                                         .differentiator = 0,
+                                         .prev_measurement = 0,
+                                         .out = 0};
 
 // PID output commands.
 float thumb_command = 0;
@@ -248,7 +313,8 @@ robotic_hand_state_t handle_state_read_analog(void) {
 
 robotic_hand_state_t handle_state_read_imu(void) {
   // bno085_run(); // TODO: WIP Implementation.
-  read_imu_flag = false; // TODO: WIP Implementation. (Remove to use this state).
+  read_imu_flag =
+      false; // TODO: WIP Implementation. (Remove to use this state).
 
   if (!read_imu_flag) { // Once update flag is reset, move to next state.
     // State exit actions.
