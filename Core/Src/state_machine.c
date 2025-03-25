@@ -113,6 +113,13 @@ stepper_motor_t pinky_stepper = {
                   STEPPER_5_4_PIN},
     .current_step = 0};
 
+// PID set points.
+float thumb_setpoint = 0;
+float index_setpoint = 0;
+float middle_setpoint = 0;
+float ring_setpoint = 0;
+float pinky_setpoint = 0;
+
 // PID controller declarations.
 pid_controller_t thumb_pid_controller = {.k_p = 0,
                                          .k_i = 0,
@@ -335,15 +342,15 @@ robotic_hand_state_t handle_state_read_misc_sensors(void) {
 
 robotic_hand_state_t handle_state_pid(void) {
   // Update PID controllers per finger.
-  thumb_command = pid_update(&thumb_pid_controller, FIXED_PID_TARGETS,
+  thumb_command = pid_update(&thumb_pid_controller, thumb_setpoint,
                              channel_data[THUMB_ADC_CHANNEL_INDEX]);
-  index_command = pid_update(&index_pid_controller, FIXED_PID_TARGETS,
+  index_command = pid_update(&index_pid_controller, index_setpoint,
                              channel_data[INDEX_ADC_CHANNEL_INDEX]);
-  middle_command = pid_update(&middle_pid_controller, FIXED_PID_TARGETS,
+  middle_command = pid_update(&middle_pid_controller, middle_setpoint,
                               channel_data[MIDDLE_ADC_CHANNEL_INDEX]);
-  ring_command = pid_update(&ring_pid_controller, FIXED_PID_TARGETS,
+  ring_command = pid_update(&ring_pid_controller, ring_setpoint,
                             channel_data[RING_ADC_CHANNEL_INDEX]);
-  pinky_command = pid_update(&pinky_pid_controller, FIXED_PID_TARGETS,
+  pinky_command = pid_update(&pinky_pid_controller, pinky_setpoint,
                              channel_data[PINKY_ADC_CHANNEL_INDEX]);
 
   // State exit actions.
