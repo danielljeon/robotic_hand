@@ -88,28 +88,24 @@ stepper_motor_t thumb_stepper = {
     .coil_pins = {STEPPER_1_1_PIN, STEPPER_1_2_PIN, STEPPER_1_3_PIN,
                   STEPPER_1_4_PIN},
     .current_step = 0};
-
 stepper_motor_t index_stepper = {
     .coil_ports = {STEPPER_2_1_PORT, STEPPER_2_1_PORT, STEPPER_2_1_PORT,
                    STEPPER_2_1_PORT},
     .coil_pins = {STEPPER_2_1_PIN, STEPPER_2_2_PIN, STEPPER_2_3_PIN,
                   STEPPER_2_4_PIN},
     .current_step = 0};
-
 stepper_motor_t middle_stepper = {
     .coil_ports = {STEPPER_3_1_PORT, STEPPER_3_2_PORT, STEPPER_3_3_PORT,
                    STEPPER_3_4_PORT},
     .coil_pins = {STEPPER_3_1_PIN, STEPPER_3_2_PIN, STEPPER_3_3_PIN,
                   STEPPER_3_4_PIN},
     .current_step = 0};
-
 stepper_motor_t ring_stepper = {
     .coil_ports = {STEPPER_4_1_PORT, STEPPER_4_1_PORT, STEPPER_4_1_PORT,
                    STEPPER_4_1_PORT},
     .coil_pins = {STEPPER_4_1_PIN, STEPPER_4_2_PIN, STEPPER_4_3_PIN,
                   STEPPER_4_4_PIN},
     .current_step = 0};
-
 stepper_motor_t pinky_stepper = {
     .coil_ports = {STEPPER_5_1_PORT, STEPPER_5_1_PORT, STEPPER_5_1_PORT,
                    STEPPER_5_1_PORT},
@@ -294,6 +290,13 @@ robotic_hand_state_t handle_state_init(void) {
   pid_init(&ring_pid_controller);
   pid_init(&pinky_pid_controller);
 
+  // Initialize the stepper motors.
+  stepper_init(&thumb_stepper);
+  stepper_init(&index_stepper);
+  stepper_init(&middle_stepper);
+  stepper_init(&ring_stepper);
+  stepper_init(&pinky_stepper);
+
   // State exit actions.
   read_analog_flag = true;
   return STATE_READ_ANALOG;
@@ -348,31 +351,34 @@ robotic_hand_state_t handle_state_pid(void) {
 }
 
 robotic_hand_state_t handle_state_update_motors(void) {
-  // Convert PID commands to motor step rate.
+  // Initialize arrays to help simplify loop logic.
+  stepper_motor_t steppers[5] = {thumb_stepper, index_stepper, middle_stepper,
+                                 ring_stepper, pinky_stepper};
+  const float commands[5] = {thumb_command, index_command, middle_command,
+                             ring_command};
 
-  //  // Steppers. // TODO: WIP Implementation.
-  //  // Initialize the stepper motors.
-  //  stepper_init(&thumb_stepper);
-  //  stepper_init(&index_stepper);
-  //  stepper_init(&middle_stepper);
-  //  stepper_init(&ring_stepper);
-  //  stepper_init(&pinky_stepper);
-  //  // Create stepper motor array.
-  //  stepper_motor_t *steppers[5] = {&thumb_stepper, &index_stepper,
-  //  &middle_stepper, &ring_stepper,
-  //                                  &pinky_stepper};
-  //  // Red LED.
-  //  ws2812b_set_colour(0, 6, 0, 0);
-  //  ws2812b_update();
-  //  // Step forward.
-  //  int steps_1[5] = {2048, 2048, 2048, 2048, 2048};
-  //  stepper_multi_full_step(steppers, steps_1, 5, 1);
-  //  // Blue LED.
-  //  ws2812b_set_colour(0, 0, 0, 6);
-  //  ws2812b_update();
-  //  // Step reverse.
-  //  int steps_2[5] = {-2048, -2048, -2048, -2048, -2048};
-  //  stepper_multi_full_step(steppers, steps_2, 5, 1);
+  // Convert commands into command steps.
+  int realized_steps[5] = {0}; // 2 = 1 full step, 1 = half step.
+  // TODO: WIP Implementation.
+
+  for (size_t i = 0; i < 5; i++) {
+    // Set LED colours based on reaching target and direction.
+    if (-0.05 < commands[i] && commands[i] < 0.05) {
+      ws2812b_set_colour(i + 1, 0, 20, 0); // Green LED.
+    } else if (0 < commands[i]) {          // Forward.
+      ws2812b_set_colour(i + 1, 20, 0, 0); // Red LED.
+    } else {                               // Backward.
+      ws2812b_set_colour(i + 1, 0, 0, 20); // Blue LED.
+    }
+
+    // Move stepper according to realized step (full or half step).
+    if (realized_steps[i] < -1 || 1 < realized_steps[i]) {
+      stepper_full_step(&steppers[i], realized_steps[i] / 2, 0);
+    } else {
+      stepper_half_step(&steppers[i], realized_steps[i], 0);
+    }
+  }
+  ws2812b_update(); // Update new set colours.
 
   // State exit actions.
   return STATE_POST_PROCESSING;
