@@ -1,22 +1,19 @@
 /*******************************************************************************
- * @file diagnostics.h
- * @brief Centralized high level diagnostics module.
+ * @file callbacks.h
+ * @brief STM32 HAL callback implementations overriding weak declarations.
  *******************************************************************************
  */
 
-#ifndef DIAGNOSTICS_H
-#define DIAGNOSTICS_H
+#ifndef CALLBACKS_H
+#define CALLBACKS_H
 
 /** Includes. *****************************************************************/
 
-#include "stm32f4xx_hal.h"
+#include "stdbool.h"
 
 /** Public variables. *********************************************************/
 
-extern uint8_t bno085_fault_count;
-
-/** Public functions. *********************************************************/
-
-void bno085_fault(void);
+extern bool read_analog_flag; // Mark when analog reading ISR is enabled.
+extern bool read_imu_flag;    // Mark when IMU reading ISR is enabled.
 
 #endif

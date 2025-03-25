@@ -49,8 +49,8 @@
 #define NUM_CHANNELS 12 // 12 AIN channels total.
 
 // Channels to monitor array.
-const uint8_t channels[NUM_CHANNELS] = {AIN0, AIN1, AIN2,  AIN3, AIN4, AIN5, AIN6, AIN7,
-                                        AIN8, AIN9, AIN10, AIN11};
+const uint8_t channels[NUM_CHANNELS] = {AIN0, AIN1, AIN2, AIN3, AIN4,  AIN5,
+                                        AIN6, AIN7, AIN8, AIN9, AIN10, AIN11};
 
 /** Private Variables. ********************************************************/
 
@@ -60,7 +60,8 @@ volatile bool mux_settling = false;         // Flag tracks channel mux state.
 
 /** Public Variables. *********************************************************/
 
-uint16_t channel_data[NUM_CHANNELS];
+uint16_t channel_data[NUM_CHANNELS] = {0};
+uint32_t full_adcs_updated_counter = 0;
 
 /** Private Functions. ********************************************************/
 
@@ -229,8 +230,10 @@ void HAL_GPIO_EXTI_Callback_ads114s08(uint16_t GPIO_Pin) {
 
     // Advance to next channel.
     current_channel_index++;
-    if (current_channel_index >= NUM_CHANNELS)
+    if (current_channel_index >= NUM_CHANNELS) {
       current_channel_index = 0;
+      full_adcs_updated_counter++; // Increment when all channels are updated.
+    }
 
     ads114s08_select(); // Bring CS pin low.
 

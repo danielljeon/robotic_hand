@@ -9,8 +9,8 @@
  *******************************************************************************
  */
 
-#ifndef NERVE__WS2812B_HAL_PWM_H
-#define NERVE__WS2812B_HAL_PWM_H
+#ifndef WS2812B_HAL_PWM_H
+#define WS2812B_HAL_PWM_H
 
 /** Includes. *****************************************************************/
 
@@ -26,7 +26,7 @@ extern TIM_HandleTypeDef htim1;
 
 /** Definitions. **************************************************************/
 
-#define LED_COUNT 1
+#define LED_COUNT 6
 
 // Based on 180 MHz peripheral clock at 9-1 prescaler and 25-1 ARR with time
 // period of 1.25 us. See README.md calculations.

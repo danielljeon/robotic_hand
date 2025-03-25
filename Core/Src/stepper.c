@@ -41,38 +41,6 @@ static const uint8_t half_step_sequence[8] = {
     0x09  // 1001.
 };
 
-/** Public stepper definitions. ***********************************************/
-
-stepper_motor_t stepper1 = {.coil_ports = {STEPPER_1_1_PORT, STEPPER_1_1_PORT,
-                                           STEPPER_1_1_PORT, STEPPER_1_1_PORT},
-                            .coil_pins = {STEPPER_1_1_PIN, STEPPER_1_2_PIN,
-                                          STEPPER_1_3_PIN, STEPPER_1_4_PIN},
-                            .current_step = 0};
-
-stepper_motor_t stepper2 = {.coil_ports = {STEPPER_2_1_PORT, STEPPER_2_1_PORT,
-                                           STEPPER_2_1_PORT, STEPPER_2_1_PORT},
-                            .coil_pins = {STEPPER_2_1_PIN, STEPPER_2_2_PIN,
-                                          STEPPER_2_3_PIN, STEPPER_2_4_PIN},
-                            .current_step = 0};
-
-stepper_motor_t stepper3 = {.coil_ports = {STEPPER_3_1_PORT, STEPPER_3_2_PORT,
-                                           STEPPER_3_3_PORT, STEPPER_3_4_PORT},
-                            .coil_pins = {STEPPER_3_1_PIN, STEPPER_3_2_PIN,
-                                          STEPPER_3_3_PIN, STEPPER_3_4_PIN},
-                            .current_step = 0};
-
-stepper_motor_t stepper4 = {.coil_ports = {STEPPER_4_1_PORT, STEPPER_4_1_PORT,
-                                           STEPPER_4_1_PORT, STEPPER_4_1_PORT},
-                            .coil_pins = {STEPPER_4_1_PIN, STEPPER_4_2_PIN,
-                                          STEPPER_4_3_PIN, STEPPER_4_4_PIN},
-                            .current_step = 0};
-
-stepper_motor_t stepper5 = {.coil_ports = {STEPPER_5_1_PORT, STEPPER_5_1_PORT,
-                                           STEPPER_5_1_PORT, STEPPER_5_1_PORT},
-                            .coil_pins = {STEPPER_5_1_PIN, STEPPER_5_2_PIN,
-                                          STEPPER_5_3_PIN, STEPPER_5_4_PIN},
-                            .current_step = 0};
-
 /** Private functions. ********************************************************/
 
 /**

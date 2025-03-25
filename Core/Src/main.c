@@ -21,8 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "init.h"
-#include "run.h"
+#include "state_machine.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -120,11 +119,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  init();
-
   while (1) {
-    // bno085_run(); // TODO: WIP Implementation.
-    run();
+    run_state_machine();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

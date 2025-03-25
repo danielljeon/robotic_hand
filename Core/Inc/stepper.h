@@ -28,59 +28,6 @@ typedef struct {
   uint8_t current_step;        // Current step index (0..7 for half-step).
 } stepper_motor_t;
 
-/** Public stepper definitions. ***********************************************/
-
-#define STEPPER_1_1_PORT GPIOC
-#define STEPPER_1_1_PIN GPIO_PIN_0
-#define STEPPER_1_2_PORT GPIOC
-#define STEPPER_1_2_PIN GPIO_PIN_3
-#define STEPPER_1_3_PORT GPIOC
-#define STEPPER_1_3_PIN GPIO_PIN_2
-#define STEPPER_1_4_PORT GPIOC
-#define STEPPER_1_4_PIN GPIO_PIN_1
-
-#define STEPPER_2_1_PORT GPIOA
-#define STEPPER_2_1_PIN GPIO_PIN_0
-#define STEPPER_2_2_PORT GPIOA
-#define STEPPER_2_2_PIN GPIO_PIN_3
-#define STEPPER_2_3_PORT GPIOA
-#define STEPPER_2_3_PIN GPIO_PIN_2
-#define STEPPER_2_4_PORT GPIOA
-#define STEPPER_2_4_PIN GPIO_PIN_1
-
-#define STEPPER_3_1_PORT GPIOB
-#define STEPPER_3_1_PIN GPIO_PIN_0
-#define STEPPER_3_2_PORT GPIOB
-#define STEPPER_3_2_PIN GPIO_PIN_10
-#define STEPPER_3_3_PORT GPIOB
-#define STEPPER_3_3_PIN GPIO_PIN_2
-#define STEPPER_3_4_PORT GPIOB
-#define STEPPER_3_4_PIN GPIO_PIN_1
-
-#define STEPPER_4_1_PORT GPIOB
-#define STEPPER_4_1_PIN GPIO_PIN_15
-#define STEPPER_4_2_PORT GPIOB
-#define STEPPER_4_2_PIN GPIO_PIN_12
-#define STEPPER_4_3_PORT GPIOB
-#define STEPPER_4_3_PIN GPIO_PIN_13
-#define STEPPER_4_4_PORT GPIOB
-#define STEPPER_4_4_PIN GPIO_PIN_14
-
-#define STEPPER_5_1_PORT GPIOC
-#define STEPPER_5_1_PIN GPIO_PIN_6
-#define STEPPER_5_2_PORT GPIOC
-#define STEPPER_5_2_PIN GPIO_PIN_9
-#define STEPPER_5_3_PORT GPIOC
-#define STEPPER_5_3_PIN GPIO_PIN_8
-#define STEPPER_5_4_PORT GPIOC
-#define STEPPER_5_4_PIN GPIO_PIN_7
-
-extern stepper_motor_t stepper1;
-extern stepper_motor_t stepper2;
-extern stepper_motor_t stepper3;
-extern stepper_motor_t stepper4;
-extern stepper_motor_t stepper5;
-
 /** Public functions. *********************************************************/
 
 /**
