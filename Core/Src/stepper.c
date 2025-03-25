@@ -51,8 +51,9 @@ static const uint8_t half_step_sequence[8] = {
  * @param seq_size Number of steps in the sequence (4 for full, 8 for half).
  * @param step_idx Current step index (0..seq_size-1).
  */
-static void stepper_set_coils(stepper_motor_t *motor, const uint8_t *sequence,
-                              uint8_t seq_size, uint8_t step_idx) {
+static void stepper_set_coils(const stepper_motor_t *motor,
+                              const uint8_t *sequence, const uint8_t seq_size,
+                              const uint8_t step_idx) {
   uint8_t pattern = sequence[step_idx % seq_size];
   for (int i = 0; i < 4; i++) {
     if (pattern & (1 << i)) {
@@ -74,9 +75,9 @@ static void stepper_set_coils(stepper_motor_t *motor, const uint8_t *sequence,
  * @param sequence Pointer to the coil sequence array (full_step or half_step).
  * @param seq_size Size of the sequence array (4 or 8).
  */
-static void stepper_do_steps(stepper_motor_t *motor, int steps,
-                             uint32_t delay_ms, const uint8_t *sequence,
-                             uint8_t seq_size) {
+static void stepper_do_steps(stepper_motor_t *motor, const int steps,
+                             const uint32_t delay_ms, const uint8_t *sequence,
+                             const uint8_t seq_size) {
   if (steps == 0) {
     return; // No movement requested.
   }
@@ -110,21 +111,26 @@ void stepper_init(stepper_motor_t *motor) {
   stepper_set_coils(motor, half_step_sequence, STEPPER_SEQUENCE_SIZE, 0);
 }
 
-void stepper_deinit(stepper_motor_t *motor) {
+void stepper_de_energize(const stepper_motor_t *motor) {
   for (int i = 0; i < 4; i++) {
     HAL_GPIO_WritePin(motor->coil_ports[i], motor->coil_pins[i],
                       GPIO_PIN_RESET);
   }
-  // Optionally reset the current step index.
-  motor->current_step = 0;
 }
 
-void stepper_half_step(stepper_motor_t *motor, int steps, uint32_t delay_ms) {
+void stepper_re_energize(const stepper_motor_t *motor) {
+  stepper_set_coils(motor, half_step_sequence, STEPPER_SEQUENCE_SIZE,
+                    motor->current_step);
+}
+
+void stepper_half_step(stepper_motor_t *motor, const int steps,
+                       const uint32_t delay_ms) {
   stepper_do_steps(motor, steps, delay_ms, half_step_sequence,
                    STEPPER_SEQUENCE_SIZE);
 }
 
-void stepper_full_step(stepper_motor_t *motor, int steps, uint32_t delay_ms) {
+void stepper_full_step(stepper_motor_t *motor, const int steps,
+                       const uint32_t delay_ms) {
   stepper_do_steps(motor, steps, delay_ms, full_step_sequence, 4);
 }
 

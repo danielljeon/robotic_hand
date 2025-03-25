@@ -373,12 +373,6 @@ robotic_hand_state_t handle_state_update_motors(void) {
   //  // Step reverse.
   //  int steps_2[5] = {-2048, -2048, -2048, -2048, -2048};
   //  stepper_multi_full_step(steppers, steps_2, 5, 1);
-  //  // Deinitialize the stepper motors.
-  //  stepper_deinit(&thumb_stepper);
-  //  stepper_deinit(&index_stepper);
-  //  stepper_deinit(&middle_stepper);
-  //  stepper_deinit(&ring_stepper);
-  //  stepper_deinit(&pinky_stepper);
 
   // State exit actions.
   return STATE_POST_PROCESSING;

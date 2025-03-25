@@ -31,22 +31,25 @@ typedef struct {
 /** Public functions. *********************************************************/
 
 /**
- * @brief Initialize the stepper motor (resets current_step to 0).
+ * @brief Initialize the stepper motor (energizes phases to current_step = 0).
  *
  * @param motor Pointer to a stepper_motor_t instance.
  */
 void stepper_init(stepper_motor_t *motor);
 
 /**
- * @brief Deinitialize the stepper motor, de-energizing all coils.
+ * @brief De-energize a stepper motor's phases.
  *
- * @param motor Pointer to the stepper_motor_t instance to deinitialize.
- *
- * This function sets all the coil pins of the stepper motor to low
- * (GPIO_PIN_RESET) to ensure that the coils are de-energized, reducing current
- * consumption.
+ * @param motor Pointer to the stepper_motor_t instance to de-energize.
  */
-void stepper_deinit(stepper_motor_t *motor);
+void stepper_de_energize(const stepper_motor_t *motor);
+
+/**
+ * @brief Re-energize a stepper motor's phases to its last known step pattern.
+ *
+ * @param motor Pointer to the stepper_motor_t instance to re-energize.
+ */
+void stepper_re_energize(const stepper_motor_t *motor);
 
 /**
  * @brief Move the motor using half-step mode (8-step sequence).
