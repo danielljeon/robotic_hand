@@ -235,8 +235,11 @@ robotic_hand_state_t handle_state_init(void) {
 }
 
 robotic_hand_state_t handle_state_read_analog(void) {
+  HAL_NVIC_EnableIRQ(ADS114S08_DRDY_EXTI_IRQn); // Enable EXTI interrupt.
+
   if (!read_analog_flag) { // Once update flag is reset, move to next state.
     // State exit actions.
+    HAL_NVIC_DisableIRQ(ADS114S08_DRDY_EXTI_IRQn); // Disable EXTI interrupt.
     read_imu_flag = true;
     return STATE_READ_IMU;
   }
@@ -323,7 +326,11 @@ robotic_hand_state_t handle_state_post_processing(void) {
 
 robotic_hand_state_t handle_state_error(void) { return STATE_IDLE; }
 
-robotic_hand_state_t handle_state_idle(void) { return STATE_READ_ANALOG; }
+robotic_hand_state_t handle_state_idle(void) {
+  // State exit actions.
+  read_analog_flag = true;
+  return STATE_READ_ANALOG;
+}
 
 /** Public functions. *********************************************************/
 
