@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "state_machine.h"
+#include "scheduler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -119,8 +120,10 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  scheduler_init();
+  scheduler_add_task(run_state_machine, 10);
   while (1) {
-    run_state_machine();
+    scheduler_run();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

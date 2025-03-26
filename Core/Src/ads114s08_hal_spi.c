@@ -8,6 +8,7 @@
 /** Includes. *****************************************************************/
 
 #include "ads114s08_hal_spi.h"
+#include "filter.h"
 #include <stdbool.h>
 
 /** ADS114S08 constants. ******************************************************/
@@ -47,10 +48,10 @@
 #define NEG_AIN AINCOM
 
 // Channels to monitor without including reference pin.
-#define NUM_CHANNELS 5 // 12 AIN channels total.
+#define NUM_CHANNELS 2 // 12 AIN channels total.
 
-// Channels to monitor array.
-const uint8_t channels[NUM_CHANNELS] = {AIN5, AIN6, AIN7, AIN8, AIN9};
+// Moving average window size.
+#define NUM_SAMPLES 5
 
 /** Private Variables. ********************************************************/
 
@@ -58,9 +59,18 @@ volatile bool ads114s08_is_init = false;    // Flag tracks if init is complete.
 volatile uint8_t current_channel_index = 0; // Tracks current channel.
 volatile bool mux_settling = false;         // Flag tracks channel mux state.
 
+// Channels to monitor array.
+const uint8_t channels[NUM_CHANNELS] = {AIN8, AIN9};
+
+// Channel value filters.
+moving_average_filter_t ain8_filter = {0};
+moving_average_filter_t ain9_filter = {0};
+
+moving_average_filter_t *filter_array[2] = {&ain8_filter, &ain9_filter};
+
 /** Public Variables. *********************************************************/
 
-uint16_t channel_data[NUM_CHANNELS] = {0};
+uint16_t channel_data[NUM_CHANNELS] = {0, 0};
 uint32_t full_adcs_updated_counter = 0;
 
 /** Private Functions. ********************************************************/
@@ -151,6 +161,10 @@ void ads114s08_write_register(const uint8_t address, const uint8_t value) {
 /** Public Functions. *********************************************************/
 
 void ads114s08_init(void) {
+  // Initialize channel filters.
+  init_filter(&ain8_filter);
+  init_filter(&ain9_filter);
+
   // Hardware reset on startup.
   HAL_GPIO_WritePin(ADS114S08_NRESET_PORT, ADS114S08_NRESET_PIN,
                     GPIO_PIN_RESET);
@@ -227,9 +241,10 @@ void HAL_GPIO_EXTI_Callback_ads114s08(uint16_t GPIO_Pin) {
 
     ads114s08_deselect(); // Bring CS pin high.
 
-    // Store result.
-    channel_data[current_channel_index] =
-        ((uint16_t)rx_buffer[0] << 8) | ((uint16_t)rx_buffer[1]);
+    // Store result using moving average filter.
+    channel_data[current_channel_index] = update_filter(
+        filter_array[current_channel_index],
+        (float)((uint16_t)rx_buffer[0] << 8 | (uint16_t)rx_buffer[1]));
 
     // Advance to next channel.
     current_channel_index++;

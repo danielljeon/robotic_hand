@@ -31,7 +31,7 @@ extern SPI_HandleTypeDef hspi3;
 
 /** Public variables. *********************************************************/
 
-extern uint16_t channel_data[5];           // Final readings per channel.
+extern uint16_t channel_data[2];           // Final readings per channel.
 extern uint32_t full_adcs_updated_counter; // Number of times all channels have
                                            // been updated.
 
