@@ -24,6 +24,7 @@
 #define ADS114S08_ID_REGISTER 0x00
 #define ADS114S08_STATUS_REGISTER 0x01
 #define ADS114S08_INPMUX_REGISTER 0x02
+#define ADS114S08_DATARATE_REGISTER 0x04
 #define ADS114S08_REF_REGISTER 0x05
 #define ADS114S08_SYS_REGISTER 0x09
 
@@ -46,11 +47,10 @@
 #define NEG_AIN AINCOM
 
 // Channels to monitor without including reference pin.
-#define NUM_CHANNELS 12 // 12 AIN channels total.
+#define NUM_CHANNELS 5 // 12 AIN channels total.
 
 // Channels to monitor array.
-const uint8_t channels[NUM_CHANNELS] = {AIN0, AIN1, AIN2, AIN3, AIN4,  AIN5,
-                                        AIN6, AIN7, AIN8, AIN9, AIN10, AIN11};
+const uint8_t channels[NUM_CHANNELS] = {AIN5, AIN6, AIN7, AIN8, AIN9};
 
 /** Private Variables. ********************************************************/
 
@@ -185,6 +185,9 @@ void ads114s08_init(void) {
   if ((nrdy[0] & 0x40) == 0) { // Device is ready.
     // Clear the FL_POR flag by writing to the status register if needed.
     ads114s08_write_register(ADS114S08_SYS_REGISTER, 0x0);
+
+    // Configure data rate for 100 samples per second.
+    ads114s08_write_register(ADS114S08_DATARATE_REGISTER, 0x17);
 
     // Configure reference input selection as REFP0, REFN0.
     ads114s08_write_register(ADS114S08_REF_REGISTER, 0x00);
