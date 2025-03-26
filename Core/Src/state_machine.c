@@ -151,8 +151,8 @@ void transmit_sensor_data(char *data) {
 void sequential_transmit_sensor_data(void) {
   char data[256];
 
-  sprintf(data, "setpoint=%f,command=%f,adc_j12=%d,adc_j13=%d", thumb_setpoint,
-          thumb_command, channel_data[0], channel_data[1]);
+  sprintf(data, "%f,%f,%d,%d", thumb_setpoint, thumb_command, channel_data[0],
+          channel_data[1]);
 
   // Transmit the data after forming the string.
   transmit_sensor_data(data);
