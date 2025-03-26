@@ -24,11 +24,11 @@
 
 #define FIXED_PID_TARGETS 30000
 
-#define THUMB_ADC_CHANNEL_INDEX 5
-#define INDEX_ADC_CHANNEL_INDEX 6
-#define MIDDLE_ADC_CHANNEL_INDEX 7
-#define RING_ADC_CHANNEL_INDEX 8
-#define PINKY_ADC_CHANNEL_INDEX 9
+#define THUMB_ADC_CHANNEL_INDEX 0
+#define INDEX_ADC_CHANNEL_INDEX 1
+#define MIDDLE_ADC_CHANNEL_INDEX 2
+#define RING_ADC_CHANNEL_INDEX 3
+#define PINKY_ADC_CHANNEL_INDEX 4
 
 /** Stepper motor pinout. *****************************************************/
 
@@ -114,78 +114,78 @@ stepper_motor_t pinky_stepper = {
     .current_step = 0};
 
 // PID set points.
-float thumb_setpoint = 0;
-float index_setpoint = 0;
-float middle_setpoint = 0;
-float ring_setpoint = 0;
-float pinky_setpoint = 0;
+float thumb_setpoint = 12000;
+float index_setpoint = 12000;
+float middle_setpoint = 12000;
+float ring_setpoint = 12000;
+float pinky_setpoint = 12000;
 
 // PID controller declarations.
-pid_controller_t thumb_pid_controller = {.k_p = 0,
+pid_controller_t thumb_pid_controller = {.k_p = 0.01,
                                          .k_i = 0,
-                                         .k_d = 0,
+                                         .k_d = 0.005,
                                          .tau = 0,
-                                         .output_min = 0,
-                                         .output_max = 0,
+                                         .output_min = -2,
+                                         .output_max = 2,
                                          .integral_min = 0,
-                                         .integral_max = 0,
-                                         .T = 0,
+                                         .integral_max = 10,
+                                         .T = 0.01,
                                          .integrator = 0,
                                          .prev_error = 0,
                                          .differentiator = 0,
                                          .prev_measurement = 0,
                                          .out = 0};
-pid_controller_t index_pid_controller = {.k_p = 0,
+pid_controller_t index_pid_controller = {.k_p = 0.01,
                                          .k_i = 0,
-                                         .k_d = 0,
+                                         .k_d = 0.005,
                                          .tau = 0,
-                                         .output_min = 0,
-                                         .output_max = 0,
+                                         .output_min = -2,
+                                         .output_max = 2,
                                          .integral_min = 0,
-                                         .integral_max = 0,
-                                         .T = 0,
+                                         .integral_max = 10,
+                                         .T = 0.01,
                                          .integrator = 0,
                                          .prev_error = 0,
                                          .differentiator = 0,
                                          .prev_measurement = 0,
                                          .out = 0};
-pid_controller_t middle_pid_controller = {.k_p = 0,
+pid_controller_t middle_pid_controller = {.k_p = 0.01,
                                           .k_i = 0,
-                                          .k_d = 0,
+                                          .k_d = 0.005,
                                           .tau = 0,
-                                          .output_min = 0,
-                                          .output_max = 0,
+                                          .output_min = -2,
+                                          .output_max = 2,
                                           .integral_min = 0,
-                                          .integral_max = 0,
-                                          .T = 0,
+                                          .integral_max = 10,
+                                          .T = 0.01,
                                           .integrator = 0,
                                           .prev_error = 0,
                                           .differentiator = 0,
                                           .prev_measurement = 0,
                                           .out = 0};
-pid_controller_t ring_pid_controller = {.k_p = 0,
+pid_controller_t ring_pid_controller = {.k_p = 0.01,
                                         .k_i = 0,
-                                        .k_d = 0,
+                                        .k_d = 0.005,
                                         .tau = 0,
-                                        .output_min = 0,
-                                        .output_max = 0,
+                                        .output_min = -2,
+                                        .output_max = 2,
                                         .integral_min = 0,
-                                        .integral_max = 0,
-                                        .T = 0,
+                                        .integral_max = 10,
+                                        .T = 0.01,
                                         .integrator = 0,
                                         .prev_error = 0,
                                         .differentiator = 0,
                                         .prev_measurement = 0,
                                         .out = 0};
-pid_controller_t pinky_pid_controller = {.k_p = 0,
+pid_controller_t pinky_pid_controller = {.k_p = 0.01,
                                          .k_i = 0,
-                                         .k_d = 0,
+                                         .k_d = 0.005,
                                          .tau = 0,
-                                         .output_min = 0,
-                                         .output_max = 0,
+                                         .output_min = -2,
+                                         .output_max = 2,
                                          .integral_min = 0,
-                                         .integral_max = 0,
-                                         .T = 0,
+                                         .integral_max = 10,
+                                         .T = 0.01,
                                          .integrator = 0,
                                          .prev_error = 0,
                                          .differentiator = 0,
@@ -228,13 +228,8 @@ void sequential_transmit_sensor_data(void) {
 
   switch (xbee_sensor_data_transmit_index) {
   case 0:
-    sprintf(data,
-            "adc->1=%d,2=%d,3=%d,4=%d,J8=%d,J9=%d,J10=%d,J11=%d,J12=%d,J13=%d,"
-            "J14=%d,11=%d",
-            channel_data[0], channel_data[1], channel_data[2], channel_data[3],
-            channel_data[4], channel_data[5], channel_data[6], channel_data[7],
-            channel_data[8], channel_data[9], channel_data[10],
-            channel_data[11]);
+    sprintf(data, "adc->J9=%d,J10=%d,J11=%d,J12=%d,J13=%d", channel_data[0],
+            channel_data[1], channel_data[2], channel_data[3], channel_data[4]);
     break;
   case 1:
     sprintf(data, "command->t=%f,i=%f,m=%f,r=%f,p=%f", thumb_command,
@@ -312,38 +307,6 @@ robotic_hand_state_t handle_state_init(void) {
   stepper_init(&pinky_stepper);
 
   // State exit actions.
-  read_analog_flag = true;
-  return STATE_READ_ANALOG;
-}
-
-robotic_hand_state_t handle_state_read_analog(void) {
-  HAL_NVIC_EnableIRQ(ADS114S08_DRDY_EXTI_IRQn); // Enable EXTI interrupt.
-
-  if (!read_analog_flag) { // Once update flag is reset, move to next state.
-    // State exit actions.
-    HAL_NVIC_DisableIRQ(ADS114S08_DRDY_EXTI_IRQn); // Disable EXTI interrupt.
-    read_imu_flag = true;
-    return STATE_READ_IMU;
-  }
-  return STATE_READ_ANALOG;
-}
-
-robotic_hand_state_t handle_state_read_imu(void) {
-  // bno085_run(); // TODO: WIP Implementation.
-  read_imu_flag =
-      false; // TODO: WIP Implementation. (Remove to use this state).
-
-  if (!read_imu_flag) { // Once update flag is reset, move to next state.
-    // State exit actions.
-    return STATE_READ_MISC_SENSORS;
-  }
-  return STATE_READ_IMU;
-}
-
-robotic_hand_state_t handle_state_read_misc_sensors(void) {
-  // TODO: WIP Implementation.
-
-  // State exit actions.
   return STATE_PID;
 }
 
@@ -369,10 +332,12 @@ robotic_hand_state_t handle_state_update_motors(void) {
   stepper_motor_t steppers[5] = {thumb_stepper, index_stepper, middle_stepper,
                                  ring_stepper, pinky_stepper};
   const float commands[5] = {thumb_command, index_command, middle_command,
-                             ring_command};
+                             ring_command, pinky_command};
 
   // Convert commands into command steps.
-  int realized_steps[5] = {0}; // 2 = 1 full step, 1 = half step.
+  int realized_steps[5] = {thumb_command, index_command, middle_command,
+                           ring_command,
+                           pinky_command}; // 2 = 1 full step, 1 = half step.
   // TODO: WIP Implementation.
 
   for (size_t i = 0; i < 5; i++) {
@@ -384,15 +349,19 @@ robotic_hand_state_t handle_state_update_motors(void) {
     } else {                               // Backward.
       ws2812b_set_colour(i + 1, 0, 0, 20); // Blue LED.
     }
+    ws2812b_update(); // Update new set colours.
 
     // Move stepper according to realized step (full or half step).
-    if (realized_steps[i] < -1 || 1 < realized_steps[i]) {
-      stepper_full_step(&steppers[i], realized_steps[i] / 2, 0);
-    } else {
-      stepper_half_step(&steppers[i], realized_steps[i], 0);
+    if (realized_steps[i] == -2) {
+      stepper_full_step(&steppers[i], -4, 1);
+    } else if (realized_steps[i] == 2) {
+      stepper_full_step(&steppers[i], 4, 1);
+    } else if (realized_steps[i] == -1) {
+      stepper_half_step(&steppers[i], -1, 1);
+    } else if (realized_steps[i] == 1) {
+      stepper_half_step(&steppers[i], 1, 1);
     }
   }
-  ws2812b_update(); // Update new set colours.
 
   // State exit actions.
   return STATE_POST_PROCESSING;
@@ -409,8 +378,7 @@ robotic_hand_state_t handle_state_error(void) { return STATE_IDLE; }
 
 robotic_hand_state_t handle_state_idle(void) {
   // State exit actions.
-  read_analog_flag = true;
-  return STATE_READ_ANALOG;
+  return STATE_PID;
 }
 
 /** Public functions. *********************************************************/
@@ -420,15 +388,6 @@ void run_state_machine(void) {
     switch (system_state) {
     case STATE_INIT:
       system_state = handle_state_init();
-      break;
-    case STATE_READ_ANALOG:
-      system_state = handle_state_read_analog();
-      break;
-    case STATE_READ_IMU:
-      system_state = handle_state_read_imu();
-      break;
-    case STATE_READ_MISC_SENSORS:
-      system_state = handle_state_read_misc_sensors();
       break;
     case STATE_PID:
       system_state = handle_state_pid();
