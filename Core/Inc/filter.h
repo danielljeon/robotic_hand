@@ -11,7 +11,7 @@
 
 #define WINDOW_SIZE 5
 
-/** Public structs. ***********************************************************/
+/** Public types. *************************************************************/
 
 typedef struct {
   float buffer[WINDOW_SIZE];

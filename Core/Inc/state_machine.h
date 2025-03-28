@@ -11,7 +11,7 @@
 
 #include <stdbool.h>
 
-/** Public structs. ***********************************************************/
+/** Public types. *************************************************************/
 
 // Defines all states of the state machine.
 typedef enum {

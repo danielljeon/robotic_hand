@@ -58,7 +58,7 @@ extern I2C_HandleTypeDef hi2c1;
  */
 // #define VL53L4CD_I2C_FAST_MODE_PLUS
 
-/** Public structs. ***********************************************************/
+/** Public types. *************************************************************/
 
 /**
  * @brief Device instance.
