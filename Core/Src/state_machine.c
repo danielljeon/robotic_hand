@@ -7,7 +7,7 @@
 /** Includes. *****************************************************************/
 
 #include "state_machine.h"
-#include "ads114s08_hal_spi.h"
+#include "ads114s0x_hal_spi.h"
 #include "bno085_runner.h"
 #include "callbacks.h"
 #include "pid.h"
@@ -151,8 +151,8 @@ void transmit_sensor_data(char *data) {
 void sequential_transmit_sensor_data(void) {
   char data[256];
 
-  sprintf(data, "%f,%f,%d,%d", thumb_setpoint, thumb_command, channel_data[0],
-          channel_data[1]);
+  sprintf(data, "%f,%f,%d,%d", thumb_setpoint, thumb_command, ads114s0x_data[0],
+          ads114s0x_data[1]);
 
   // Transmit the data after forming the string.
   transmit_sensor_data(data);
@@ -169,7 +169,7 @@ robotic_hand_state_t handle_state_init(void) {
   ws2812b_update();
 
   // Initialize sensors.
-  ads114s08_init();
+  ads114s0x_init();
   // bno085_reset(); // TODO: WIP Implementation.
   // bno085_init(); // TODO: WIP Implementation.
   // vl53l4cd_init(); // TODO: WIP Implementation.
@@ -191,11 +191,11 @@ robotic_hand_state_t handle_state_init(void) {
 robotic_hand_state_t handle_state_pid(void) {
   // Lowest measurement.
   uint16_t measurement = 0;
-  if (channel_data[THUMB_ADC1_CHANNEL_INDEX] <
-      channel_data[THUMB_ADC2_CHANNEL_INDEX]) {
-    measurement = channel_data[THUMB_ADC2_CHANNEL_INDEX];
+  if (ads114s0x_data[THUMB_ADC1_CHANNEL_INDEX] <
+      ads114s0x_data[THUMB_ADC2_CHANNEL_INDEX]) {
+    measurement = ads114s0x_data[THUMB_ADC2_CHANNEL_INDEX];
   } else {
-    measurement = channel_data[THUMB_ADC1_CHANNEL_INDEX];
+    measurement = ads114s0x_data[THUMB_ADC1_CHANNEL_INDEX];
   }
 
   // Update PID controllers per finger.
