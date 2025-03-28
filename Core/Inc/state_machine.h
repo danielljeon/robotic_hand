@@ -28,7 +28,7 @@ typedef enum {
 /** Public variables. *********************************************************/
 
 extern robotic_hand_state_t system_state;
-extern bool systemRunning;
+extern bool system_running;
 
 /** Public functions. *********************************************************/
 
