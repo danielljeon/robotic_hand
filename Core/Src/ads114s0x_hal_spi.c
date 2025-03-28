@@ -276,8 +276,10 @@ void ads114s0x_init(void) {
   state = ADS114S0X_INIT; // Update state for initializing.
 
   // Initialize channel filters.
-  init_filter(&ain8_filter);
-  init_filter(&ain9_filter);
+  for (uint8_t i = 0; i < NUM_CHANNELS; i++) {
+    ads114s0x_data[i] = 0;
+    init_filter(filter_array[i]);
+  }
 
   // Hardware reset on startup.
   HAL_GPIO_WritePin(ADS114S0X_NRESET_PORT, ADS114S0X_NRESET_PIN,
