@@ -12,8 +12,7 @@
 
 /** ADS114S0x constants. ******************************************************/
 
-#define ADS114S0X_DEVICE_ID 0x4
-
+// Datasheet defined commands.
 #define ADS114S0X_CMD_RESET 0x06
 #define ADS114S0X_CMD_START 0x08
 #define ADS114S0X_CMD_STOP 0x0A
@@ -21,6 +20,7 @@
 #define ADS114S0X_CMD_RREG 0x20
 #define ADS114S0X_CMD_WREG 0x40
 
+// Datasheet defined register addresses.
 #define ADS114S0X_ID_REGISTER 0x00
 #define ADS114S0X_STATUS_REGISTER 0x01
 #define ADS114S0X_INPMUX_REGISTER 0x02
@@ -28,7 +28,7 @@
 #define ADS114S0X_REF_REGISTER 0x05
 #define ADS114S0X_SYS_REGISTER 0x09
 
-// Analog input channel definitions.
+// Datasheet defined analog input channel definitions.
 #define AIN0 0x00   // 0000: AIN0 (default).
 #define AIN1 0x01   // 0001: AIN1.
 #define AIN2 0x02   // 0010: AIN2.
@@ -43,11 +43,33 @@
 #define AIN11 0x0B  // 1011: AIN11 (ADS114S08 only).
 #define AINCOM 0x0C // 1100: AINCOM.
 
-// Configured negative (GND) reference channel.
-#define NEG_AIN AINCOM
+// Datasheet defined samples per second (SPS) definitions.
+#define SPS_2_5 0x00      // 0000 : 2.5 SPS.
+#define SPS_5 0x01        // 0001 : 5 SPS.
+#define SPS_10 0x02       // 0010 : 10 SPS.
+#define SPS_16_6 0x03     // 0011 : 16.6 SPS.
+#define SPS_20 0x04       // 0100 : 20 SPS (default).
+#define SPS_50 0x05       // 0101 : 50 SPS.
+#define SPS_60 0x06       // 0110 : 60 SPS.
+#define SPS_100 0x07      // 0111 : 100 SPS.
+#define SPS_200 0x08      // 1000 : 200 SPS.
+#define SPS_400 0x09      // 1001 : 400 SPS.
+#define SPS_800 0x0A      // 1010 : 800 SPS.
+#define SPS_1000 0x0B     // 1011 : 1000 SPS.
+#define SPS_2000 0x0C     // 1100 : 2000 SPS.
+#define SPS_4000 0x0D     // 1101 : 4000 SPS.
+#define SPS_4000_ALT 0x0E // 1110 : 4000 SPS (alternate code).
+
+/** Definitions. **************************************************************/
 
 // SPI DMA based buffer size.
 #define SPI_DMA_BUFFER_SIZE 2
+
+// User configured negative (GND) reference channel.
+#define NEG_AIN AINCOM
+
+// User configured sample rate.
+#define SAMPLE_RATE SPS_4000
 
 /** Private types. ************************************************************/
 
@@ -217,8 +239,8 @@ void ads114s0x_configure(void) {
     // Clear the FL_POR flag by writing to the status register if needed.
     ads114s0x_write_register(ADS114S0X_SYS_REGISTER, 0x0);
 
-    // Configure data rate for 100 samples per second.
-    ads114s0x_write_register(ADS114S0X_DATARATE_REGISTER, 0x17);
+    // Configure data rate for default config with modified samples per second.
+    ads114s0x_write_register(ADS114S0X_DATARATE_REGISTER, 0x10 | SAMPLE_RATE);
 
     // Configure reference input selection as REFP0, REFN0.
     ads114s0x_write_register(ADS114S0X_REF_REGISTER, 0x00);
