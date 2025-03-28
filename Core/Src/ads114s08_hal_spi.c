@@ -158,6 +158,57 @@ void ads114s08_write_register(const uint8_t address, const uint8_t value) {
   HAL_SPI_Transmit(&ADS114S08_HSPI, cmdBuffer, 3, HAL_MAX_DELAY);
 }
 
+/**
+ * @brief Reset and send configuration commands.
+ *
+ * Runs all steps to reset, configure and restart the ADS114S08.
+ */
+void ads114s08_configure(void) {
+  ads114s08_select(); // Bring CS pin low.
+
+  HAL_SPI_Transmit(&ADS114S08_HSPI, (const uint8_t *)ADS114S08_CMD_RESET, 1,
+                   HAL_MAX_DELAY); // Reset the device.
+
+  HAL_Delay(5); // Wait 4096 * tCLK.
+
+  uint8_t nrdy[1] = {0}; // Read the status register to check the RDY bit.
+
+  // Read status register to ensure device is ready.
+  ads114s08_read_register(ADS114S08_STATUS_REGISTER, nrdy, 1);
+
+  if ((nrdy[0] & 0x40) == 0) { // Device is ready.
+    // Clear the FL_POR flag by writing to the status register if needed.
+    ads114s08_write_register(ADS114S08_SYS_REGISTER, 0x0);
+
+    // Configure data rate for 100 samples per second.
+    ads114s08_write_register(ADS114S08_DATARATE_REGISTER, 0x17);
+
+    // Configure reference input selection as REFP0, REFN0.
+    ads114s08_write_register(ADS114S08_REF_REGISTER, 0x00);
+
+    ads114s08_write_command(ADS114S08_CMD_START); // Start ADC conversions.
+  }
+
+  ads114s08_deselect(); // Bring CS pin high.
+}
+
+/**
+ * @brief Configure mux for given channel.
+ *
+ * @param ain_channel Channel to configure input channel mux.
+ */
+void ads114s08_mux(uint8_t ain_channel) {
+  ads114s08_select(); // Bring CS pin low.
+
+  // Configure mux.
+  const uint8_t mux = ((ain_channel << 4) & 0xF0) | (NEG_AIN & 0x0F);
+  ads114s08_write_register(ADS114S08_INPMUX_REGISTER, mux);
+
+  ads114s08_write_command(ADS114S08_CMD_START); // Restart conversion.
+
+  ads114s08_deselect(); // Bring CS pin high.
+}
+
 /** Public Functions. *********************************************************/
 
 void ads114s08_init(void) {
@@ -180,45 +231,46 @@ void ads114s08_init(void) {
 
   HAL_Delay(3); // Wait at least 2.2 ms for power stabilization.
 
-  ads114s08_select(); // Bring CS pin low.
+  ads114s08_configure(); // Reset, configure and restart.
 
   HAL_Delay(1); // Wait td(CSSC) = 20 ns.
-
-  // Reset the device.
-  HAL_SPI_Transmit(&ADS114S08_HSPI, (const uint8_t *)ADS114S08_CMD_RESET, 1,
-                   HAL_MAX_DELAY);
-
-  HAL_Delay(5); // Wait 4096 * tCLK.
-
-  // Read the status register to check the RDY bit.
-  uint8_t nrdy[1] = {0};
-
-  // Read status register.
-  ads114s08_read_register(ADS114S08_STATUS_REGISTER, nrdy, 1);
-
-  if ((nrdy[0] & 0x40) == 0) { // Device is ready.
-    // Clear the FL_POR flag by writing to the status register if needed.
-    ads114s08_write_register(ADS114S08_SYS_REGISTER, 0x0);
-
-    // Configure data rate for 100 samples per second.
-    ads114s08_write_register(ADS114S08_DATARATE_REGISTER, 0x17);
-
-    // Configure reference input selection as REFP0, REFN0.
-    ads114s08_write_register(ADS114S08_REF_REGISTER, 0x00);
-
-    // Start ADC conversions.
-    ads114s08_write_command(ADS114S08_CMD_START);
-
-  } else { // Device not ready.
-    // Handle error: device not ready.
-  }
-
-  ads114s08_deselect(); // Bring CS pin high.
 
   ads114s08_is_init = true; // Flag initialization as complete.
 }
 
 /** Override Functions. *******************************************************/
+/**
+ * @brief Callback function called when a DMA SPI transmit completes.
+ *
+ * @param hspi_ptr Pointer to the SPI handle.
+ */
+void HAL_SPI_TxCpltCallback_ads114s08(SPI_HandleTypeDef *hspi_ptr) {
+  if (hspi_ptr == &ADS114S08_HSPI) {
+    spi_dma_tx_complete = 1;
+  }
+}
+
+/**
+ * @brief Callback function called when a DMA SPI receive completes.
+ * @param hspi_ptr Pointer to the SPI handle.
+ */
+void HAL_SPI_RxCpltCallback_ads114s08(SPI_HandleTypeDef *hspi_ptr) {
+  if (hspi_ptr == &ADS114S08_HSPI) {
+    spi_dma_rx_complete = 1;
+  }
+}
+
+/**
+ * @brief Callback function called when a full-duplex DMA SPI completes.
+ *
+ * @param hspi_ptr Pointer to the SPI handle.
+ */
+void HAL_SPI_TxRxCpltCallback_ads114s08(SPI_HandleTypeDef *hspi_ptr) {
+  if (hspi_ptr == &ADS114S08_HSPI) {
+    spi_dma_tx_complete = 1;
+    spi_dma_rx_complete = 1;
+  }
+}
 
 void HAL_GPIO_EXTI_Callback_ads114s08(uint16_t GPIO_Pin) {
   if (GPIO_Pin == ADS114S08_DRDY_PIN && ads114s08_is_init) {
@@ -237,7 +289,7 @@ void HAL_GPIO_EXTI_Callback_ads114s08(uint16_t GPIO_Pin) {
     ads114s08_select(); // Bring CS pin low.
 
     ads114s08_write_command(ADS114S08_CMD_RDATA);
-    HAL_SPI_Receive(&ADS114S08_HSPI, rx_buffer, 3, HAL_MAX_DELAY);
+    HAL_SPI_Receive_DMA(&ADS114S08_HSPI, rx_buffer, 3);
 
     ads114s08_deselect(); // Bring CS pin high.
 
@@ -253,17 +305,7 @@ void HAL_GPIO_EXTI_Callback_ads114s08(uint16_t GPIO_Pin) {
       full_adcs_updated_counter++; // Increment when all channels are updated.
     }
 
-    ads114s08_select(); // Bring CS pin low.
-
-    // Configure MUX.
-    const uint8_t mux =
-        ((channels[current_channel_index] << 4) & 0xF0) | (NEG_AIN & 0x0F);
-    ads114s08_write_register(ADS114S08_INPMUX_REGISTER, mux);
-
-    // Restart conversion to ensure DRDY toggles.
-    ads114s08_write_command(ADS114S08_CMD_START);
-
-    ads114s08_deselect(); // Bring CS pin high.
+    ads114s08_mux(channels[current_channel_index]); // Configure mux.
 
     mux_settling = true;
   }
