@@ -84,8 +84,7 @@ typedef enum {
   ADS114S0X_INIT = 1,
   ADS114S0X_AWAIT_DATA_READY = 2,
   ADS114S0X_AWAIT_DATA_RX = 3,
-  ADS114S0X_DATA_RECEIVED = 4,
-  ADS114S0X_ERROR = 5,
+  ADS114S0X_ERROR = 4,
 } ads114s0x_state_t;
 
 typedef enum {
