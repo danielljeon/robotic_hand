@@ -9,7 +9,6 @@
 #include "state_machine.h"
 #include "ads114s0x_hal_spi.h"
 #include "bno085_runner.h"
-#include "callbacks.h"
 #include "pid.h"
 #include "stepper.h"
 #include "ws2812b_hal_pwm.h"
@@ -22,8 +21,8 @@
 #define XBEE_DESTINATION_64 0x0013A200425E94A0
 #define XBEE_DESTINATION_16 0xFFFE
 
-#define THUMB_ADC1_CHANNEL_INDEX 0
-#define THUMB_ADC2_CHANNEL_INDEX 1
+#define THUMB_ADC1_CHANNEL_INDEX 8
+#define THUMB_ADC2_CHANNEL_INDEX 9
 
 /** Stepper motor pinout. *****************************************************/
 
