@@ -17,7 +17,7 @@
 // Define the number of steps in our half-step sequence.
 #define STEPPER_SEQUENCE_SIZE 8
 
-/** Public structs. ***********************************************************/
+/** Public types. *************************************************************/
 
 /**
  * @brief Motor structure to hold a stepper motor's coil configuration.
