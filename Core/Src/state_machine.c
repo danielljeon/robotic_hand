@@ -183,6 +183,8 @@ robotic_hand_state_t handle_state_init(void) {
   stepper_init(&ring_stepper);
   stepper_init(&pinky_stepper);
 
+  HAL_Delay(1500); // Allow analog signals to settle for ADC purposes.
+
   // State exit actions.
   return STATE_PID;
 }
