@@ -14,22 +14,24 @@ repo: [robotic_hand_pcb](https://github.com/danielljeon/robotic_hand_pcb).
   <summary>Table of Contents</summary>
 
 <!-- TOC -->
+
 * [robotic_hand](#robotic_hand)
-  * [1 Overview](#1-overview)
-    * [1.1 Bill of Materials (BOM)](#11-bill-of-materials-bom)
-    * [1.2 Block Diagram](#12-block-diagram)
-    * [1.3 Pin Configurations](#13-pin-configurations)
-    * [1.4 Clock Configurations](#14-clock-configurations)
-  * [2 VL53L4CD Time of Flight (TOF) Sensor](#2-vl53l4cd-time-of-flight-tof-sensor)
-    * [2.1 Background](#21-background)
-    * [2.2 Inter-Integrated Circuit (I2C)](#22-inter-integrated-circuit-i2c)
-    * [2.3 VL53L4CD Driver](#23-vl53l4cd-driver)
-  * [2 ADS114S08 Analog to Digital Convertor (ADC) IC](#2-ads114s08-analog-to-digital-convertor-adc-ic)
-    * [2.1 Background](#21-background-1)
-    * [2.2 Serial Peripheral Interface (SPI)](#22-serial-peripheral-interface-spi)
-    * [2.3 Nested Vectored Interrupt Controller (NVIC)](#23-nested-vectored-interrupt-controller-nvic)
-      * [2.3.1 GPIO External Interrupt/Event Controller (EXTI)](#231-gpio-external-interruptevent-controller-exti)
-    * [2.4 ADS114S08 Driver](#24-ads114s08-driver)
+    * [1 Overview](#1-overview)
+        * [1.1 Bill of Materials (BOM)](#11-bill-of-materials-bom)
+        * [1.2 Block Diagram](#12-block-diagram)
+        * [1.3 Pin Configurations](#13-pin-configurations)
+        * [1.4 Clock Configurations](#14-clock-configurations)
+    * [2 VL53L4CD Time of Flight (TOF) Sensor](#2-vl53l4cd-time-of-flight-tof-sensor)
+        * [2.1 Background](#21-background)
+        * [2.2 Inter-Integrated Circuit (I2C)](#22-inter-integrated-circuit-i2c)
+        * [2.3 VL53L4CD Driver](#23-vl53l4cd-driver)
+    * [2 ADS114S08 Analog to Digital Convertor (ADC) IC](#2-ads114s08-analog-to-digital-convertor-adc-ic)
+        * [2.1 Background](#21-background-1)
+        * [2.2 Serial Peripheral Interface (SPI)](#22-serial-peripheral-interface-spi)
+        * [2.3 Nested Vectored Interrupt Controller (NVIC)](#23-nested-vectored-interrupt-controller-nvic)
+            * [2.3.1 GPIO External Interrupt/Event Controller (EXTI)](#231-gpio-external-interruptevent-controller-exti)
+        * [2.4 ADS114S08 Driver](#24-ads114s08-driver)
+
 <!-- TOC -->
 
 </details>
@@ -37,6 +39,8 @@ repo: [robotic_hand_pcb](https://github.com/danielljeon/robotic_hand_pcb).
 ---
 
 ## 1 Overview
+
+![demo.gif](docs/demo.gif)
 
 ### 1.1 Bill of Materials (BOM)
 
